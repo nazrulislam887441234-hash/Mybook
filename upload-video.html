@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; margin: 0; }
+    .post-container { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .preview-box {
+            width: 100%;
+            aspect-ratio: 9/16;
+            max-height: 500px;
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            overflow: hidden;
+            background: #000;
+       }
+    .preview-box video { width: 100%; height: 100%; object-fit: cover; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        #postBtn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; }
+        #postBtn:disabled { background: #ccc; cursor: not-allowed; }
+        #status { text-align: center; margin-top: 10px; font-size: 14px; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <h3>ভিডিও আপলোড করুন</h3>
+
+        <input type="file" id="videoInput" hidden accept="video/*">
+        <div class="preview-box" onclick="document.getElementById('videoInput').click()">
+            <span id="placeholderText" style="color:#999;">ভিডিও সিলেক্ট করুন</span>
+            <video id="videoPreview" style="display:none;" controls playsinline></video>
+        </div>
+
+        <input type="text" id="caption" placeholder="ক্যাপশন লিখুন...">
+        <select id="category">
+            <option value="">ক্যাটাগরি সিলেক্ট করুন</option>
+            <option value="Tech">Tech</option><option value="News">News</option><option value="Vlog">Vlog</option>
+            <option value="Gaming">Gaming</option><option value="Travel">Travel</option><option value="Entertainment">Entertainment</option>
+            <option value="Movie">Movie</option><option value="Natok">Natok</option><option value="Funny">Funny</option>
+            <option value="Sports">Sports</option><option value="Food & Recipe">Food & Recipe</option><option value="Education">Education</option>
+            <option value="Islamic">Islamic</option><option value="Life Style">Life Style</option><option value="Business & Money">Business & Money</option>
+            <option value="Freelancing">Freelancing</option>
+        </select>
+        <button id="postBtn" disabled>Upload Video</button>
+        <div id="status"></div>
+    </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
+    authDomain: "mybook-95b97.firebaseapp.com",
+    projectId: "mybook-95b97",
+    storageBucket: "mybook-95b97.firebasestorage.app",
+    messagingSenderId: "689741505296",
+    appId: "1:689741505296:web:818d83962a0825f64a7b95"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const WORKER_URL = "https://mybookvideo.nazrulislam887441234.workers.dev";
+
+const videoInput = document.getElementById('videoInput');
+const videoPreview = document.getElementById('videoPreview');
+const postBtn = document.getElementById('postBtn');
+const status = document.getElementById('status');
+const placeholderText = document.getElementById('placeholderText');
+let selectedFile = null;
+
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "index.html"; });
+
+const checkForm = () => {
+    const cat = document.getElementById('category').value;
+    const cap = document.getElementById('caption').value;
+    postBtn.disabled =!(cat && cap && selectedFile);
+};
+document.getElementById('caption').oninput = checkForm;
+document.getElementById('category').onchange = checkForm;
+
+// ভিডিও সিলেক্ট
+videoInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 1 মিনিট চেক
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        if (video.duration > 60) {
+            alert("ভিডিও ১ মিনিটের বেশি আপলোড করা যাবে না!");
+            videoInput.value = "";
+            return;
+        }
+
+        // ঠিক থাকলে মেইন প্রিভিউতে দেখান
+        selectedFile = file;
+        const url = URL.createObjectURL(file);
+        videoPreview.src = url;
+        videoPreview.style.display = "block";
+        placeholderText.style.display = "none";
+        checkForm();
+    };
+    video.src = URL.createObjectURL(file);
+};
+
+// আপাতত কমপ্রেস ছাড়া ডিরেক্ট আপলোড
+postBtn.onclick = async () => {
+    if (!auth.currentUser) return alert("আগে লগইন করুন!");
+    if (!selectedFile) return alert("ভিডিও সিলেক্ট করুন!");
+    const caption = document.getElementById('caption').value;
+    const category = document.getElementById('category').value;
+
+    postBtn.innerText = "Processing...";
+    postBtn.disabled = true;
+
+    try {
+        const fileName = `${auth.currentUser.uid}_${Date.now()}.mp4`;
+        status.innerText = "R2 তে আপলোড হচ্ছে...";
+
+        const res = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileName })
+        });
+        const { uploadUrl, publicUrl } = await res.json();
+
+        // ডিরেক্ট অরিজিনাল ফাইল আপলোড
+        await fetch(uploadUrl, { method: 'PUT', body: selectedFile });
+
+        status.innerText = "Firestore এ সেভ হচ্ছে...";
+        const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
+        const userData = userSnap.data();
+
+        await addDoc(collection(db, "videos"), {
+            uid: auth.currentUser.uid,
+            userName: userData.name,
+            userPhoto: userData.photo || "",
+            videoUrl: publicUrl,
+            caption: caption,
+            category: category,
+            createdAt: serverTimestamp(),
+            likes: [],
+            views: 0
+        });
+
+        alert("ভিডিও সফলভাবে আপলোড হয়েছে!");
+        window.location.href = "profile.html";
+
+    } catch (err) {
+        console.error(err);
+        alert("Upload failed: " + err.message);
+        postBtn.innerText = "Upload Video";
+        postBtn.disabled = false;
+        status.innerText = "";
+    }
+};
+</script>
+</body>
+</html>
