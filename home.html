@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Book Feed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 70px; }
+        header { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo { font-size: 22px; font-weight: bold; color: #007bff; display: flex; align-items: center; gap: 10px; }
+        
+        .filter-box { padding: 10px; background: white; border-bottom: 1px solid #ddd; }
+        select { width: 100%; padding: 10px; border-radius: 20px; border: 1px solid #ccc; outline: none; }
+
+        .story-section { display: flex; gap: 10px; padding: 15px; overflow-x: auto; background: white; margin-bottom: 10px; }
+        .story { width: 80px; height: 120px; border-radius: 10px; background: #ddd; flex-shrink: 0; border: 2px solid #007bff; background-size: cover; background-position: center; }
+
+        .post-card { background: white; margin-bottom: 15px; padding: 15px; }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; }
+        .stats { display: flex; justify-content: space-around; padding: 15px 0 5px; border-top: 1px solid #eee; margin-top: 10px; }
+        
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
+        .nav-btn { font-size: 22px; cursor: pointer; color: #555; }
+    </style>
+</head>
+<body>
+ <audio id="likeSound">
+    <source src="like.mp3" type="audio/mpeg">
+</audio>
+    <header>
+        <div class="logo"><img src="https://i.ibb.co.com/FqYZrjH3/20260609-103856.png" width="30"> My Book</div>
+    </header>
+
+    <div class="filter-box">
+        <select id="categoryFilter" onchange="filterPosts()">
+            <option value="All">All Categories</option>
+            <option value="Tech">Tech</option><option value="News">News</option>
+            <option value="Vlog">Vlog</option><option value="Gaming">Gaming</option>
+            <option value="Travel">Travel</option><option value="Entertainment">Entertainment</option>
+            <option value="Movie">Movie</option><option value="Natok">Natok</option>
+            <option value="Funny">Funny</option><option value="Sports">Sports</option>
+            <option value="Food & Recipe">Food & Recipe</option><option value="Education">Education</option>
+            <option value="Islamic">Islamic</option><option value="Life Style">Life Style</option>
+            <option value="Business & Money">Business & Money</option><option value="Freelancing">Freelancing</option>
+        </select>
+    </div>
+
+    <div class="story-section" id="stories"></div>
+    <div id="feed"></div>
+
+    <div class="nav-bar">
+        <div class="nav-btn" onclick="window.location.href='home.html'"><i class="fa-solid fa-house"></i></div>
+        <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+        <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+        <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { 
+        getFirestore, collection, getDocs, getDoc, query, orderBy, limit, 
+        startAfter, doc, updateDoc, arrayUnion, arrayRemove 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
+        authDomain: "mybook-95b97.firebaseapp.com",
+        projectId: "mybook-95b97",
+        storageBucket: "mybook-95b97.firebasestorage.app",
+        messagingSenderId: "689741505296",
+        appId: "1:689741505296:web:818d83962a0825f64a7b95"
+    };
+
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const auth = getAuth();
+    let lastVisible = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = 'index.html';
+        else { loadStories(); loadFeed(true); }
+    });
+
+    async function loadStories() {
+        const storySection = document.getElementById('stories');
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(5));
+        const snap = await getDocs(q);
+        storySection.innerHTML = "";
+        snap.forEach((docSnap) => {
+            const p = docSnap.data();
+            storySection.innerHTML += `<div class="story" style="background-image:url('${p.imageUrl}')"></div>`;
+        });
+    }
+
+    window.loadFeed = async function(isInitial = false) {
+        const feed = document.getElementById('feed');
+        if (isInitial) feed.innerHTML = '<div style="text-align:center; padding:20px;">লোডিং...</div>';
+
+        const oldBtn = document.getElementById("loadMoreBtn");
+        if (oldBtn) oldBtn.remove();
+
+        let q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(10));
+        if (!isInitial && lastVisible) q = query(collection(db, "posts"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(10));
+
+        const snap = await getDocs(q);
+        if (isInitial) feed.innerHTML = "";
+        lastVisible = snap.docs[snap.docs.length - 1];
+
+        // ইউজারের ফলোয়িং লিস্ট চেক করার জন্য
+        const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+        const followingList = userDoc.data()?.following || [];
+
+        snap.forEach((docSnap) => {
+            const p = docSnap.data();
+            if (p.uid === auth.currentUser.uid) return; 
+
+            const postId = docSnap.id;
+            const isLiked = p.likes?.includes(auth.currentUser.uid);
+            const isFollowing = followingList.includes(p.uid);
+
+            feed.innerHTML += `
+            <div class="post-card" data-cat="${p.category}">
+                <div class="post-header" onclick="window.location.href='user-profile.html?uid=${p.uid}'" style="cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <img src="${p.userPhoto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                        <b>${p.userName}</b>
+                    </div>
+                    <button id="followBtn-${p.uid}" onclick="event.stopPropagation(); followUser('${p.uid}')" 
+                        style="background:${isFollowing ? '#ccc' : '#007bff'}; color:white; border:none; padding:6px 15px; border-radius:15px; font-weight:bold;">
+                        ${isFollowing ? 'Following' : 'Follow'}
+                    </button>
+                </div>
+                <p>${p.caption}</p>
+                <img src="${p.imageUrl}" class="post-img" ondblclick="like('${postId}', true)">
+                
+                <div class="stats" style="display:flex; justify-content: space-between; padding: 10px 20px;">
+                    <button id="likeBtn-${postId}" onclick="like('${postId}')" style="border:none; background:none; cursor:pointer;">
+                        <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${isLiked ? 'red' : 'black'}"></i> Like
+                    </button>
+                    <button onclick="window.location.href='comments.html?id=${postId}'" style="border:none; background:none; cursor:pointer;">
+                        <i class="fa-regular fa-comment"></i> Comment
+                    </button>
+                    <button style="border:none; background:none; cursor:pointer;">
+                        <i class="fa-solid fa-share"></i> Share
+                    </button>
+                </div>
+            </div>`;
+        });
+        
+        if (snap.docs.length === 10) {
+            const btn = document.createElement("button");
+            btn.id = "loadMoreBtn";
+            btn.innerText = "See More";
+            btn.style.cssText = "width:100%; padding:15px; margin-bottom:70px; background:#e4e6eb; border:none; border-radius:10px; font-weight:bold;";
+            btn.onclick = () => loadFeed(false);
+            feed.appendChild(btn);
+        }
+    };
+
+    window.like = async (id, isDoubleTap = false) => {
+        const btn = document.getElementById(`likeBtn-${id}`);
+        const icon = btn.querySelector("i");
+        const postRef = doc(db, "posts", id);
+        const uid = auth.currentUser.uid;
+        
+        const postSnap = await getDoc(postRef);
+        const likes = postSnap.data().likes || [];
+
+        if(!likes.includes(uid)) {
+            await updateDoc(postRef, { likes: arrayUnion(uid) });
+            icon.className = "fa-solid fa-heart";
+            icon.style.color = "red";
+            document.getElementById("likeSound").play();
+        } else if (!isDoubleTap) {
+            await updateDoc(postRef, { likes: arrayRemove(uid) });
+            icon.className = "fa-regular fa-heart";
+            icon.style.color = "black";
+        }
+    };
+
+    window.followUser = async (uid) => {
+        const btn = document.getElementById(`followBtn-${uid}`);
+        btn.innerText = "Following";
+        btn.style.background = "#ccc";
+        await updateDoc(doc(db, "users", auth.currentUser.uid), { following: arrayUnion(uid) });
+        await updateDoc(doc(db, "users", uid), { followers: arrayUnion(auth.currentUser.uid) });
+    };
+</script>
+
+
+</body>
+</html>
