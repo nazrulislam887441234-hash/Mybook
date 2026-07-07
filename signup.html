@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Signup</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f9f9f9; padding: 20px; margin: 0; }
+        .container { width: 100%; max-width: 350px; background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .logo { width: 120px; margin-bottom: 10px; }
+        .photo-box { width: 120px; height: 120px; border-radius: 50%; background: #eee; margin: 10px auto; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; }
+        #coverPhoto { width: 100%; height: 100px; border: 2px dashed #ccc; margin: 10px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+        button { width: 100%; padding: 15px; background: #00ff44; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; color: white; font-size: 16px; margin-top: 15px; }
+        button:disabled { background: #888; }
+        .preview { width: 100%; height: 100%; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="20260609_103856.png" class="logo">
+        <input type="file" id="profileInput" hidden accept="image/*">
+        <div class="photo-box" onclick="document.getElementById('profileInput').click()">Profile Photo</div>
+        <input type="file" id="coverInput" hidden accept="image/*">
+        <div id="coverPhoto" onclick="document.getElementById('coverInput').click()">Cover Photo</div>
+        <button id="finishBtn" onclick="finishSignup()">Finish</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
+            authDomain: "mybook-95b97.firebaseapp.com",
+            projectId: "mybook-95b97",
+            storageBucket: "mybook-95b97.firebasestorage.app",
+            messagingSenderId: "689741505296",
+            appId: "1:689741505296:web:818d83962a0825f64a7b95"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const IMGBB_KEY = "fd8494417e28e4de2384f71202e82d27";
+
+        // ইমেজ প্রিভিউ
+        document.getElementById('profileInput').onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => { document.querySelector('.photo-box').innerHTML = `<img src="${ev.target.result}" class="preview">`; };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+        document.getElementById('coverInput').onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => { document.getElementById('coverPhoto').innerHTML = `<img src="${ev.target.result}" class="preview">`; };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+                window.finishSignup = async () => {
+            const btn = document.getElementById('finishBtn');
+            const pFile = document.getElementById('profileInput').files[0];
+            const cFile = document.getElementById('coverInput').files[0];
+
+            if(!pFile || !cFile) return alert("Please select both photos!");
+            
+            // LocalStorage চেক
+            const signupData = JSON.parse(localStorage.getItem('signupData'));
+            if(!signupData || !signupData.email || !signupData.password) {
+                return alert("Signup data missing! Please go back to step 1.");
+            }
+
+            btn.innerText = "Please wait...";
+            btn.disabled = true;
+
+            try {
+                // ১. ইমেজ আপলোড
+                const upload = async (file) => {
+                    let fd = new FormData(); fd.append("image", file);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                    const resData = await res.json();
+                    if(!resData.success) throw new Error("Image upload failed");
+                    return resData.data.url;
+                };
+
+                const [pUrl, cUrl] = await Promise.all([upload(pFile), upload(cFile)]);
+                
+                // ২. Firebase এ ইউজার তৈরি
+                console.log("Creating user for:", signupData.email);
+                const cred = await createUserWithEmailAndPassword(auth, signupData.email, signupData.password);
+                
+                // ৩. Firestore এ ডেটা সেভ
+                await setDoc(doc(db, "users", cred.user.uid), { 
+                    name: signupData.fullName, 
+                    email: signupData.email, 
+                    profile: pUrl, 
+                    cover: cUrl,
+                    uid: cred.user.uid 
+                });
+                
+                alert("Signup Completed login now!");
+                window.location.href = 'index.html'; 
+            } catch (err) { 
+                console.error(err); // ব্রাউজারের কনসোলে ভুলটি দেখাবে
+                alert("Error: " + err.message); 
+                btn.innerText = "Finish"; 
+                btn.disabled = false; 
+            }
+        };
+    </script>
+</body>
+</html>
