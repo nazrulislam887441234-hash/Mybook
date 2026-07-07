@@ -1,155 +1,107 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post</title>
-    <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .post-container { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .preview-box { width: 100%; height: 200px; border: 2px dashed #ccc; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; cursor: pointer; overflow: hidden; background: #f9f9f9; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; }
-        #postBtn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; }
-        #postBtn:disabled { background: #ccc; cursor: not-allowed; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Book Post</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  body { background: #f0f2f5; padding-bottom: 80px; }
+  
+  /* Header */
+  .header {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header img { width: 35px; height: 35px; border-radius: 50%; }
+  .header h1 { font-size: 22px; color: #1877f2; font-weight: 700; }
+
+  /* Main Content */
+  .container { padding: 20px; max-width: 600px; margin: auto; }
+  .card {
+    background: #fff;
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+
+  /* 2 Big Buttons */
+  .btn-group { display: flex; flex-direction: column; gap: 15px; }
+  .btn {
+    display: block;
+    padding: 18px;
+    background: #1877f2;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+  .btn:hover { background: #0d65d9; transform: translateY(-2px); }
+  .btn:nth-child(2) { background: #42b72a; }
+  .btn:nth-child(2):hover { background: #36a420; }
+
+  /* Bottom Navigation - এটাই মেইন ফিক্স */
+  .nav-bar { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0;
+    width: 100%; 
+    background: white; 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 12px 0; 
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 100;
+  }
+  .nav-btn { 
+    font-size: 24px; 
+    cursor: pointer; 
+    color: #65676b; 
+    text-align: center;
+    flex: 1;
+    transition: 0.2s;
+  }
+  .nav-btn:hover { color: #1877f2; }
+.btn:active { transform: scale(0.97); }
+</style>
 </head>
 <body>
-    <div class="post-container">
-        <h3>Create Post</h3>
-        <input type="file" id="postImage" hidden accept="image/*">
-        <div class="preview-box" onclick="document.getElementById('postImage').click()">
-            <span id="placeholderText">Select Image</span>
-            <img id="imagePreview" style="display:none;">
-        </div>
-        <input type="text" id="caption" placeholder="What's on your mind?">
-        <select id="category" onchange="checkForm()">
-            <option value="">Select Category</option>
-            <option value="Tech">Tech</option><option value="News">News</option><option value="Vlog">Vlog</option>
-            <option value="Gaming">Gaming</option><option value="Travel">Travel</option><option value="Entertainment">Entertainment</option>
-            <option value="Movie">Movie</option><option value="Natok">Natok</option><option value="Funny">Funny</option>
-            <option value="Sports">Sports</option><option value="Food & Recipe">Food & Recipe</option><option value="Education">Education</option>
-            <option value="Islamic">Islamic</option><option value="Life Style">Life Style</option><option value="Business & Money">Business & Money</option>
-            <option value="Freelancing">Freelancing</option>
-        </select>
-        <button id="postBtn" disabled>Post Now</button>
+
+ <div class="header">
+  <img src="20260609_103856.png" alt="logo">
+  <h1>My Book</h1>
+  <div style="margin-left:auto; display:flex; gap:15px;">
+  </div>
+</div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="card">
+      <div class="btn-group">
+        <a href="upload-video.html" class="btn">Upload Video</a>
+        <a href="upload-photo.html" class="btn">Upload Photo</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="nav-bar">
+        <div class="nav-btn" onclick="window.location.href='home.html'"><i class="fa-solid fa-house"></i></div>
+        <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+        <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+        <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
     </div>
 
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    const firebaseConfig = {
-    apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
-    authDomain: "mybook-95b97.firebaseapp.com",
-    projectId: "mybook-95b97",
-    storageBucket: "mybook-95b97.firebasestorage.app",
-    messagingSenderId: "689741505296",
-    appId: "1:689741505296:web:818d83962a0825f64a7b95"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// 👇 এইখানে বসাবেন
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "index.html";
-    }
-});
-
-const IMGBB_KEY = "fd8494417e28e4de2384f71202e82d27";
-        window.checkForm = () => {
-            const cat = document.getElementById('category').value;
-            const img = document.getElementById('postImage').files[0];
-            document.getElementById('postBtn').disabled = !(cat && img);
-        };
-
-        document.getElementById('postImage').onchange = (e) => {
-    const file = e.target.files[0];
-
-    const reader = new FileReader();
-
-    reader.onload = (ev) => {
-        const img = document.getElementById('imagePreview');
-        img.src = ev.target.result;
-        img.style.display = 'block';
-
-        document.getElementById('placeholderText').style.display = 'none';
-
-        checkForm();
-    };
-
-    reader.readAsDataURL(file);
-};
-
-        document.getElementById('postBtn').onclick = async () => {
-    const file = document.getElementById('postImage').files[0];
-    const caption = document.getElementById('caption').value;
-    const category = document.getElementById('category').value;
-    const btn = document.getElementById('postBtn');
-     if (!auth.currentUser) {
-        alert("Please login first!");
-        window.location.href = "index.html";
-        return;
-    }
-
-    if (!file) {
-        alert("Please select an image!");
-        return;
-    }
-
-    if (!category) {
-        alert("Please select a category!");
-        return;
-    }
-    if (!caption.trim()) {
-    alert("Please write a caption!");
-    return;
-    }
-    btn.innerText = "Uploading...";
-    btn.disabled = true;
-
-    try {
-        const fd = new FormData();
-        fd.append("image", file);
-
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-            method: "POST",
-            body: fd
-        });
-
-        const data = await res.json();
-
-        if (!data.success) {
-            throw new Error("Image upload failed.");
-        }
-
-        const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
-const userData = userSnap.data();
-
-await addDoc(collection(db, "posts"), {
-    uid: auth.currentUser.uid,
-    userName: userData.name,
-    userPhoto: userData.profile,
-    imageUrl: data.data.url,
-    caption: caption,
-    category: category,
-    createdAt: serverTimestamp(),
-    likes: [],
-    comments: []
-});
-
-        alert("Post uploaded successfully!");
-        window.location.href = "profile.html";
-
-    } catch (err) {
-        alert("Upload failed: " + err.message);
-        btn.innerText = "Post Now";
-        btn.disabled = false;
-    }
-};
-    </script>
 </body>
 </html>
