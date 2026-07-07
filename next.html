@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Step 1</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 20px; font-family: sans-serif; background: #f9f9f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 350px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        .logo { width: 120px; margin-bottom: 15px; }
+        input { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #ccc; border-radius: 25px; outline: none; }
+        .pass-group { position: relative; }
+        .toggle-btn { position: absolute; right: 15px; top: 22px; cursor: pointer; font-size: 14px; color: #888; }
+        .date-group { display: flex; gap: 5px; margin: 10px 0; }
+        .date-group input { flex: 1; text-align: center; }
+        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .links { margin-top: 15px; font-size: 13px; color: #555; }
+        .links a { color: red; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="20260609_103856.png" class="logo">
+        <input type="text" id="fullName" placeholder="Enter your full name">
+        <input type="email" id="email" placeholder="E-mail Address">
+        
+        <div class="pass-group">
+            <input type="password" id="password" placeholder="Password">
+            <span class="toggle-btn" onclick="togglePass('password')">👁️</span>
+        </div>
+        <div class="pass-group">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <span class="toggle-btn" onclick="togglePass('confirmPassword')">👁️</span>
+        </div>
+        
+        <p>Enter your birthday</p>
+        <div class="date-group">
+            <input type="number" id="day" placeholder="Day">
+            <input type="number" id="month" placeholder="Month">
+            <input type="number" id="year" placeholder="Year">
+        </div>
+        
+        <button onclick="saveStep1()">Next</button>
+        
+        <div class="links">
+            <a href="privacy-policy.html">privacy-policy</a> | 
+            <a href="termsandcondition.html">Terms and condition</a>
+        </div>
+    </div>
+
+    <script>
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            input.type = (input.type === "password") ? "text" : "password";
+        }
+        function saveStep1() {
+            const data = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                birthday: `${document.getElementById('day').value}/${document.getElementById('month').value}/${document.getElementById('year').value}`
+            };
+            if(data.password.length < 6) return alert("Password must be at least 6 characters!");
+            if(data.password !== document.getElementById('confirmPassword').value) return alert("Passwords do not match!");
+            localStorage.setItem('signupData', JSON.stringify(data));
+            window.location.href = 'signup.html';
+        }
+    </script>
+</body>
+</html>
