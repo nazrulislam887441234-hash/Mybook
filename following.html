@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Following - My Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 70px; }
+        header { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo { font-size: 22px; font-weight: bold; color: #007bff; display: flex; align-items: center; gap: 10px; }
+        .tab-bar { display: flex; background: white; border-bottom: 1px solid #ddd; }
+        .tab-btn { flex: 1; padding: 14px; border: none; background: none; font-size: 16px; font-weight: bold; cursor: pointer; color: #555; text-decoration: none; text-align: center; }
+        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
+        .post-card { background: white; margin-bottom: 15px; padding: 15px; }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; }
+        .stats { display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; margin-top: 10px; }
+        .stats button { border:none; background:none; cursor:pointer; font-size: 15px; color: #555; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
+        .nav-btn { font-size: 22px; cursor: pointer; color: #555; }
+        .loader { width: 50px; height: 50px; border: 5px solid #ddd; border-top: 5px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<audio id="likeSound"><source src="like.mp3" type="audio/mpeg"></audio>
+
+<header>
+    <div class="logo"><img src="https://i.ibb.co.com/FqYZrjH3/20260609-103856.png" width="30"> My Book</div>
+</header>
+
+<div class="tab-bar">
+    <a href="foryou.html" class="tab-btn">For You</a>
+    <a href="following.html" class="tab-btn active">Following</a>
+</div>
+
+<div id="feed"></div>
+
+<div class="nav-bar">
+    <div class="nav-btn" onclick="window.location.href='home.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+</div>
+
+<script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";  
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";  
+import { getFirestore, collection, getDocs, getDoc, query, limit, startAfter, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
+
+const firebaseConfig = {  apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",  authDomain: "mybook-95b97.firebaseapp.com",  projectId: "mybook-95b97",  storageBucket: "mybook-95b97.firebasestorage.app",  messagingSenderId: "689741505296",  appId: "1:689741505296:web:818d83962a0825f64a7b95"  };  
+const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(); 
+
+let allPostsBuffer = []; let displayedCount = 0;  const POSTS_PER_LOAD = 5; const FETCH_LIMIT = 20; 
+let currentUserId = ""; let followingList = []; let lastDoc = null; let isLoading = false;
+
+onAuthStateChanged(auth, (user) => {  
+    if (!user) window.location.href = 'index.html';  
+    else {  currentUserId = user.uid; loadFeed(true);  }  
+});  
+
+window.loadFeed = async function(isInitial = false) {  
+    if(isLoading) return; isLoading = true;
+    const feed = document.getElementById("feed");  
+    if (isInitial) {  feed.innerHTML = `<div style="text-align:center;padding:40px;"><div class="loader"></div><p>Loading...</p></div>`;  displayedCount = 0;  allPostsBuffer = []; lastDoc = null; }  
+
+    const userDoc = await getDoc(doc(db, "users", currentUserId));  
+    followingList = userDoc.data()?.following || [];  
+    if(followingList.length === 0){ feed.innerHTML = `<p style="text-align:center;padding:40px;">কাউকে Follow করেননি</p>`; isLoading = false; return; }
+
+    // FIX: orderBy বাদ দিলাম। Error হবে না
+    let q; 
+    if(lastDoc){ q = query(collection(db, "posts"), startAfter(lastDoc), limit(FETCH_LIMIT));  } 
+    else { q = query(collection(db, "posts"), limit(FETCH_LIMIT));  }
+    
+    const snap = await getDocs(q);  
+    if(snap.empty) {  if(isInitial) feed.innerHTML = `<p style="text-align:center;padding:40px;">কোনো পোস্ট নেই</p>`; lastDoc = null;  isLoading = false;  return; }
+    lastDoc = snap.docs[snap.docs.length - 1];
+    
+    snap.forEach((docSnap) => { 
+        const p = docSnap.data();
+        if(!p.createdAt) p.createdAt = {seconds: 0};
+        // শুধু Follow করা মানুষ
+        if(followingList.includes(p.uid) && p.uid !== currentUserId){
+            allPostsBuffer.push({id: docSnap.id, ...p});
+        }
+    });
+
+    // নতুন পোস্ট আগে
+    allPostsBuffer.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    renderPosts();
+    isLoading = false;
+};
+
+function renderPosts(){
+    const feed = document.getElementById("feed");  
+    if(displayedCount === 0) feed.innerHTML = "";  
+
+    const postsToShow = allPostsBuffer.slice(displayedCount, displayedCount + POSTS_PER_LOAD);
+    
+    if(postsToShow.length === 0 && displayedCount === 0){
+        feed.innerHTML = `<p style="text-align:center;padding:40px;">Follow করা কেউ পোস্ট করেনি</p>`;
+        return;
+    }
+    
+    postsToShow.forEach((p) => {  
+        const postId = p.id;  
+        const isLiked = p.likes?.includes(currentUserId);  
+        const isViewed = p.views?.includes(currentUserId);
+        const likeCount = p.likes?.length || 0;
+        const commentCount = p.commentsCount || 0;
+        const viewCount = p.views?.length || 0;
+
+        feed.innerHTML += `  
+        <div class="post-card" id="post-${postId}" data-postid="${postId}">  
+            <div class="post-header" onclick="window.location.href='user-profile.html?uid=${p.uid}'" style="cursor:pointer;">  
+                <div style="display:flex;align-items:center;gap:10px;">  
+                    <img src="${p.userPhoto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">  
+                    <b>${p.userName}</b>  
+                </div>  
+            </div>  
+            <p>${p.caption}</p>  
+            <img src="${p.imageUrl}" class="post-img" ondblclick="handleLike('${postId}', true)">  
+              
+            <div class="stats" id="stats-${postId}">  
+                <button id="likeBtn-${postId}" onclick="handleLike('${postId}')">  
+                    <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${isLiked ? 'red' : 'black'}"></i> ${likeCount}  
+                </button>  
+                <button onclick="window.location.href='comments.html?id=${postId}'">  
+                    <i class="fa-regular fa-comment"></i> ${commentCount}  
+                </button>  
+                <button>  
+                    <i class="fa-solid fa-eye"></i> ${viewCount}  
+                </button>  
+            </div>  
+        </div>`;  
+
+        if(!isViewed){ 
+            setTimeout(() => {
+                const el = document.getElementById(`post-${postId}`);
+                if(el) viewObserver.observe(el);
+            }, 100)
+        }
+    });  
+    displayedCount += POSTS_PER_LOAD;
+}
+
+const viewObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const postId = entry.target.dataset.postid;
+            addView(postId);
+            viewObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.7 });
+
+window.addView = async (postId) => {
+    const postRef = doc(db, "posts", postId);
+    const postSnap = await getDoc(postRef);
+    const views = postSnap.data().views || [];
+    if(!views.includes(currentUserId)){
+        await updateDoc(postRef, { views: arrayUnion(currentUserId) });
+        updateStatsUI(postId);
+    }
+}
+
+async function updateStatsUI(postId){
+    const postSnap = await getDoc(doc(db, "posts", postId));
+    const p = postSnap.data();
+    const statsDiv = document.getElementById(`stats-${postId}`);
+    if(statsDiv){
+        statsDiv.innerHTML = `
+            <button id="likeBtn-${postId}" onclick="handleLike('${postId}')">  
+                <i class="${p.likes?.includes(currentUserId) ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${p.likes?.includes(currentUserId) ? 'red' : 'black'}"></i> ${p.likes?.length || 0}  
+            </button>  
+            <button onclick="window.location.href='comments.html?id=${postId}'">  
+                <i class="fa-regular fa-comment"></i> ${p.commentsCount || 0}  
+            </button>  
+            <button>  
+                <i class="fa-solid fa-eye"></i> ${p.views?.length || 0}  
+            </button>  
+        `;
+    }
+}
+
+window.handleLike = async (postId, isDoubleTap = false) => {
+    const postRef = doc(db, "posts", postId);
+    const btn = document.getElementById(`likeBtn-${postId}`);
+    const postSnap = await getDoc(postRef);
+    let likes = postSnap.data().likes || [];
+    let likeCount = likes.length;
+    let isLikedNow = likes.includes(currentUserId);
+
+    if(!isLikedNow) {
+        await updateDoc(postRef, { likes: arrayUnion(currentUserId) });
+        likeCount++; isLikedNow = true;
+        document.getElementById("likeSound").play();
+    } else if (!isDoubleTap) {
+        await updateDoc(postRef, { likes: arrayRemove(currentUserId) });
+        likeCount--; isLikedNow = false;
+    }
+    btn.innerHTML = `<i class="${isLikedNow ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${isLikedNow ? 'red' : 'black'}"></i> ${likeCount}`;
+    updateStatsUI(postId);
+}
+
+window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+        if(displayedCount < allPostsBuffer.length){
+            renderPosts();
+        } else {
+            loadFeed(false);
+        }
+    }
+});
+</script>
+</body>
+</html>
