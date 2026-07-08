@@ -3,143 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comments</title>
+    <title>Comments - My Book</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { box-sizing: border-box; }
-        body { font-family: sans-serif; background: #f9f9f9; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .comment { padding: 10px 0; border-bottom: 1px solid #eee; }
-        .comment b { color: #007bff; font-size: 14px; }
-        .comment p { margin: 5px 0 0; color: #333; }
-        .input-area { margin-top: 20px; display: flex; gap: 5px; }
-        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 20px; cursor: pointer; }
-        .offline { color: red; text-align: center; font-weight: bold; margin-top: 20px; }
-     body{
-    padding-bottom:80px;
-}
-
-.nav-bar{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:65px;
-    background:#fff;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    box-shadow:0 -2px 10px rgba(0,0,0,.15);
-    z-index:9999;
-}
-
-.nav-btn{
-    flex:1;
-    text-align:center;
-    cursor:pointer;
-}
-
-.nav-btn i{
-    font-size:26px;
-    color:#444;
-}
-
-.nav-btn:active i{
-    color:#007bff;
-}
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; }
+        header { padding: 15px; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 99; display: flex; align-items: center; gap: 10px; }
+        header i { font-size: 22px; cursor: pointer; }
+        .comment { display: flex; gap: 10px; padding: 12px 15px; border-bottom: 1px solid #f0f2f5; }
+        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; flex-shrink: 0; }
+        .comment-body { flex: 1; }
+        .comment-header { display: flex; justify-content: space-between; align-items: center; }
+        .comment-name { font-weight: bold; font-size: 14px; cursor: pointer; }
+        .follow-btn { background: #007bff; color: white; border: none; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .follow-btn.following { background: #ccc; color: #333; }
+        .comment-text { margin: 5px 0; font-size: 15px; color: #333; }
+        .comment-actions { display: flex; gap: 20px; font-size: 13px; color: #555; }
+        .comment-actions span { cursor: pointer; }
+        .comment-actions span:hover { color: #007bff; }
+        .reply-box { display: flex; gap: 8px; margin-top: 8px; padding-left: 50px; }
+        .reply-box input { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 18px; outline: none; font-size: 14px; }
+        .reply-box button { background: #007bff; color: white; border: none; border-radius: 18px; padding: 0 15px; cursor: pointer; }
+        .replies { margin-left: 50px; margin-top: 10px; border-left: 2px solid #f0f2f5; padding-left: 10px; }
+        .input-area { position: fixed; bottom: 65px; left: 0; width: 100%; background: white; padding: 10px; display: flex; gap: 10px; border-top: 1px solid #ddd; max-width: 600px; margin: 0 auto; left: 50%; transform: translateX(-50%); }
+        .input-area input { flex: 1; padding: 12px 18px; border: 1px solid #ddd; border-radius: 25px; outline: none; background: #f0f2f5; }
+        .input-area button { padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .nav-bar{ position:fixed; bottom:0; left:0; width:100%; height:65px; background:#fff; display:flex; justify-content:space-around; align-items:center; box-shadow:0 -2px 10px rgba(0,0,0,.15); z-index:9999; }
+        .nav-btn{ flex:1; text-align:center; cursor:pointer; }
+        .nav-btn i{ font-size:26px; color:#444; }
+        .nav-btn:active i{ color:#007bff; }
+        .offline { color: red; text-align: center; font-weight: bold; margin-top: 20px; padding: 20px; }
     </style>
 </head>
 <body>
+<audio id="notiSound"><source src="like.mp3" type="audio/mpeg"></audio>
 
-    <div class="container" id="mainContainer">
-        <h3>Comments</h3>
-        <div id="commentList">Loading...</div>
-        
-        <div class="input-area">
-            <input type="text" id="commentInput" placeholder="Write a comment...">
-            <button onclick="postComment()">Post</button>
-        </div>
-    </div>
-<div class="nav-bar">
-    <div class="nav-btn" onclick="window.location.href='home.html'">
-        <i class="fa-solid fa-house"></i>
-    </div>
-
-    <div class="nav-btn" onclick="window.location.href='post.html'">
-        <i class="fa-solid fa-plus"></i>
-    </div>
-
-    <div class="nav-btn" onclick="window.location.href='profile.html'">
-        <i class="fa-solid fa-user"></i>
-    </div>
-
-    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'">
-        <i class="fa-solid fa-store"></i>
-    </div>
+<div class="container">
+    <header>
+        <i class="fa-solid fa-arrow-left" onclick="history.back()"></i>
+        <h3 style="margin:0;">Comments</h3>
+    </header>
+    <div id="commentList">Loading...</div>
 </div>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
-            authDomain: "mybook-95b97.firebaseapp.com",
-            projectId: "mybook-95b97",
-            storageBucket: "mybook-95b97.firebasestorage.app",
-            messagingSenderId: "689741505296",
-            appId: "1:689741505296:web:818d83962a0825f64a7b95"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        const postId = new URLSearchParams(window.location.search).get("id");
-        const commentList = document.getElementById('commentList');
+<div class="input-area">
+    <input type="text" id="commentInput" placeholder="Write a comment...">
+    <button onclick="postComment()">Post</button>
+</div>
 
-        // কমেন্ট পোস্ট ফাংশন
-        window.postComment = async () => {
-            const text = document.getElementById('commentInput').value;
-            if(!text) return;
+<div class="nav-bar">
+    <div class="nav-btn" onclick="window.location.href='home.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+</div>
 
-            try {
-                await updateDoc(doc(db, "posts", postId), {
-                    comments: arrayUnion({
-                        text: text,
-                        user: auth.currentUser.email,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-                location.reload();
-            } catch (e) {
-                commentList.innerHTML = `<p class="offline">You're currently offline. Please try again later.</p>`;
-            }
-        };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // কমেন্ট লোড করার লজিক
-        async function loadComments() {
-            try {
-                const snap = await getDoc(doc(db, "posts", postId));
-                const data = snap.data();
-                commentList.innerHTML = "";
-                
-                if (data.comments && data.comments.length > 0) {
-                    data.comments.forEach(c => {
-                        commentList.innerHTML += `
-                            <div class="comment">
-                                <b>${c.user}</b>
-                                <p>${c.text}</p>
-                            </div>`;
-                    });
-                } else {
-                    commentList.innerHTML = "<p>No comments yet.</p>";
-                }
-            } catch (e) {
-                commentList.innerHTML = `<p class="offline">You're currently offline. Please try again later.</p>`;
-            }
-        }
+const firebaseConfig = { apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const postId = new URLSearchParams(window.location.search).get("id");
+const commentList = document.getElementById('commentList');
+let currentUserId = "";
+let followingList = [];
+
+onAuthStateChanged(auth, async (user) => {
+    if(!user) window.location.href = 'index.html';
+    else {
+        currentUserId = user.uid;
+        const userDoc = await getDoc(doc(db, "users", currentUserId));
+        followingList = userDoc.data()?.following || [];
         loadComments();
-    </script>
+    }
+});
+
+// কমেন্ট পোস্ট
+window.postComment = async (replyTo = null) => {
+    const inputId = replyTo ? `replyInput-${replyTo}` : 'commentInput';
+    const text = document.getElementById(inputId).value.trim();
+    if(!text) return;
+
+    const userDoc = await getDoc(doc(db, "users", currentUserId));
+    const userData = userDoc.data();
+
+    // FIX 1: userName আর userPhoto হোম পেজের মতো
+    const newComment = {
+        id: Date.now().toString(),
+        text: text,
+        uid: currentUserId,
+        userName: userData.userName || userData.name || "User", // 2টাই চেক করবে
+        userPhoto: userData.userPhoto || userData.photoURL || "https://i.ibb.co/5x3yZ7N/default.png",
+        timestamp: Date.now(),
+        replyTo: replyTo
+    };
+
+    try {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+        const currentCount = postSnap.data().commentsCount || 0;
+
+        await updateDoc(postRef, {
+            comments: arrayUnion(newComment),
+            commentsCount: currentCount + 1
+        });
+        document.getElementById(inputId).value = "";
+        document.getElementById("notiSound").play();
+        loadComments();
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+};
+
+// Follow/Unfollow
+window.toggleFollow = async (uid, btn) => {
+    const isFollowing = followingList.includes(uid);
+    const userRef = doc(db, "users", currentUserId);
+    const targetRef = doc(db, "users", uid);
+
+    if(isFollowing){
+        // FIX 2: Unfollow এর জন্য arrayRemove
+        await updateDoc(userRef, { following: arrayRemove(uid) });
+        await updateDoc(targetRef, { followers: arrayRemove(currentUserId) });
+        btn.innerText = "Follow";
+        btn.classList.remove("following");
+        followingList = followingList.filter(id => id !== uid);
+    } else {
+        await updateDoc(userRef, { following: arrayUnion(uid) });
+        await updateDoc(targetRef, { followers: arrayUnion(currentUserId) });
+        btn.innerText = "Following";
+        btn.classList.add("following");
+        followingList.push(uid);
+    }
+    document.getElementById("notiSound").play();
+}
+
+// Reply box show
+window.showReplyBox = (id) => {
+    const box = document.getElementById(`replyBox-${id}`);
+    box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// কমেন্ট লোড
+async function loadComments() {
+    try {
+        const snap = await getDoc(doc(db, "posts", postId));
+        const data = snap.data();
+        commentList.innerHTML = "";
+        
+        if (data.comments && data.comments.length > 0) {
+            const mainComments = data.comments.filter(c => !c.replyTo).sort((a,b) => b.timestamp - a.timestamp);
+            
+            mainComments.forEach(c => {
+                const isFollowing = followingList.includes(c.uid);
+                const replies = data.comments.filter(r => r.replyTo === c.id).sort((a,b) => a.timestamp - b.timestamp);
+
+                commentList.innerHTML += `
+                    <div class="comment">
+                        <img src="${c.userPhoto}" class="comment-avatar" onclick="window.location.href='user-profile.html?uid=${c.uid}'">
+                        <div class="comment-body">
+                            <div class="comment-header">
+                                <span class="comment-name" onclick="window.location.href='user-profile.html?uid=${c.uid}'">${c.userName}</span>
+                                ${c.uid !== currentUserId ? `<button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${c.uid}', this)">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+                            </div>
+                            <p class="comment-text">${c.text}</p>
+                            <div class="comment-actions">
+                                <span onclick="showReplyBox('${c.id}')"><i class="fa-regular fa-comment"></i> Reply</span>
+                            </div>
+                            <div class="reply-box" id="replyBox-${c.id}" style="display:none;">
+                                <input type="text" id="replyInput-${c.id}" placeholder="Write a reply...">
+                                <button onclick="postComment('${c.id}')">Reply</button>
+                            </div>
+                            <div class="replies">
+                                ${replies.map(r => `
+                                    <div class="comment" style="padding:8px 0;">
+                                        <img src="${r.userPhoto}" class="comment-avatar" style="width:32px; height:32px;" onclick="window.location.href='user-profile.html?uid=${r.uid}'">
+                                        <div class="comment-body">
+                                            <span class="comment-name" onclick="window.location.href='user-profile.html?uid=${r.uid}'">${r.userName}</span>
+                                            <p class="comment-text">${r.text}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            commentList.innerHTML = "<p style='text-align:center; padding:40px;'>No comments yet. Be the first!</p>";
+        }
+    } catch (e) {
+        commentList.innerHTML = `<p class="offline">Something wrong. please try again later.</p>`;
+    }
+}
+</script>
 </body>
 </html>
