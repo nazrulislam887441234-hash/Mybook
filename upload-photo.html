@@ -2,154 +2,304 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Create Post - My Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .post-container { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .preview-box { width: 100%; height: 200px; border: 2px dashed #ccc; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; cursor: pointer; overflow: hidden; background: #f9f9f9; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; }
-        #postBtn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; }
-        #postBtn:disabled { background: #ccc; cursor: not-allowed; }
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: #000;
+            margin: 0; min-height: 100vh; padding-bottom: calc(80px + env(safe-area-inset-bottom));
+        }
+
+ .bg {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        animation: colorChange 1s infinite alternate; z-index: -1;
+    }
+    @keyframes colorChange {
+        0%{background: linear-gradient(135deg, #667eea, #764ba2)}
+        25%{background: linear-gradient(135deg, #f093fb, #f5576c)}
+        50%{background: linear-gradient(135deg, #4facfe, #00f2fe)}
+        75%{background: linear-gradient(135deg, #43e97b, #38f9d7)}
+        100%{background: linear-gradient(135deg, #fa709a, #fee140)}
+     }
+
+ .post-container {
+        width: 100%; max-width: 540px; margin: 0 auto;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid rgba(255,255,255,0.15);
+        min-height: 100vh; border-radius: 0;
+        box-shadow: 0 0 60px rgba(0,0,0,0.5);
+        animation: fadeIn 0.5s ease;
+     }
+     @media (min-width: 768px) {.post-container { border-radius: 30px; margin: 20px auto; min-height: calc(100vh - 40px); } }
+     @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+
+ .header {
+        padding: 18px 20px; display: flex; align-items: center; justify-content: space-between;
+        background: rgba(0,0,0,0.2); backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255,255,255,0.1); color: white;
+        position: sticky; top: 0; z-index: 10;
+        padding-top: calc(18px + env(safe-area-inset-top));
+     }
+ .header-left { display: flex; align-items: center; gap: 15px; }
+ .header i {
+        font-size: 20px; cursor: pointer;
+        background: rgba(255,255,255,0.15); width: 38px; height: 38px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; transition: 0.2s;
+     }
+ .header i:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+ .header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+ .draft-btn { font-size: 15px; color: #00d4ff; font-weight: 600; cursor: pointer; }
+
+ .content { padding: 20px; }
+
+ .preview-box {
+        width: 100%; height: 320px;
+        border: 2px dashed rgba(255,255,255,0.25);
+        border-radius: 25px; display: flex; align-items: center; justify-content: center;
+        margin-bottom: 20px; cursor: pointer; overflow: hidden;
+        background: rgba(255,255,255,0.05);
+        flex-direction: column; color: rgba(255,255,255,0.7);
+        transition: all 0.3s cubic-bezier(.4,0,.2,1);
+     }
+ .preview-box:active { transform: scale(0.98); }
+ .preview-box.has-image { border-style: solid; border-color: rgba(255,255,255,0.4); }
+ .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+ .preview-box i { font-size: 55px; margin-bottom: 12px; }
+ .preview-box.text { font-size: 16px; font-weight: 600; }
+ .preview-box.size { font-size: 12px; margin-top: 8px; color: #00ff88; font-weight: 700; }
+
+        input, select, textarea {
+            width: 100%; padding: 15px 18px; margin-bottom: 15px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            border-radius: 18px; outline: none; font-size: 16px;
+            background: rgba(255,255,255,0.08); color: white;
+            backdrop-filter: blur(20px); font-family: 'Hind Siliguri', sans-serif;
+        }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.5); }
+        select option { color: black; background: white; }
+        input:focus, select:focus, textarea:focus {
+            border-color: #00d4ff; background: rgba(255,255,255,0.12);
+        }
+
+        #postBtn {
+            width: 100%; padding: 17px;
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            color: white; border: none; border-radius: 20px;
+            font-weight: 700; cursor: pointer; font-size: 17px;
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+            transition: all 0.2s cubic-bezier(.4,0,.2,1);
+            margin-bottom: 10px;
+        }
+        #postBtn:active:not(:disabled) { transform: scale(0.97); }
+        #postBtn:disabled { background: rgba(255,255,255,0.1); cursor: not-allowed; box-shadow: none; color: rgba(255,255,255,0.4); }
+
+  .progress {
+        height: 5px; background: rgba(255,255,255,0.15);
+        border-radius: 10px; margin-top: 12px; overflow: hidden; display: none;
+      }
+  .progress-bar {
+        height: 100%; width: 0%;
+        background: linear-gradient(90deg, #00ff88, #00d4ff);
+        transition: 0.3s; border-radius: 10px;
+      }
+
+ .bottom-nav {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: rgba(0,0,0,0.3); backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border-top: 1px solid rgba(255,255,255,0.1);
+        display: flex; justify-content: space-around; align-items: center;
+        padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+        z-index: 100;
+     }
+ .nav-item {
+        flex: 1; text-align: center; color: rgba(255,255,255,0.5);
+        font-size: 24px; cursor: pointer; transition: 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+     }
+ .nav-item:active { transform: scale(0.9); }
+ .nav-item.active { color: #00d4ff; }
+ .nav-item span { font-size: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
+    <div class="bg"></div>
     <div class="post-container">
-        <h3>Create Post</h3>
-        <input type="file" id="postImage" hidden accept="image/*">
-        <div class="preview-box" onclick="document.getElementById('postImage').click()">
-            <span id="placeholderText">Select Image</span>
-            <img id="imagePreview" style="display:none;">
+        <div class="header">
+            <div class="header-left">
+                <i class="fa-arrow-left" onclick="window.location.href='post.html'"></i>
+                <h3>New Post</h3>
+            </div>
+            <div class="draft-btn">Draft</div>
         </div>
-        <input type="text" id="caption" placeholder="What's on your mind?">
-        <select id="category" onchange="checkForm()">
-            <option value="">Select Category</option>
-            <option value="Tech">Tech</option><option value="News">News</option><option value="Vlog">Vlog</option>
-            <option value="Gaming">Gaming</option><option value="Travel">Travel</option><option value="Entertainment">Entertainment</option>
-            <option value="Movie">Movie</option><option value="Natok">Natok</option><option value="Funny">Funny</option>
-            <option value="Sports">Sports</option><option value="Food & Recipe">Food & Recipe</option><option value="Education">Education</option>
-            <option value="Islamic">Islamic</option><option value="Life Style">Life Style</option><option value="Business & Money">Business & Money</option>
-            <option value="Freelancing">Freelancing</option>
-        </select>
-        <button id="postBtn" disabled>Post Now</button>
+        <div class="content">
+
+            <input type="file" id="postImage" hidden accept="image/*">
+            <div class="preview-box" id="previewBox" onclick="document.getElementById('postImage').click()">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span class="text" id="placeholderText">Tap to add photo</span>
+                <img id="imagePreview" style="display:none;">
+                <div class="size" id="fileSize"></div>
+            </div>
+
+            <textarea id="caption" placeholder="Write a caption... ✨" rows="4"></textarea>
+
+            <select id="category" onchange="checkForm()">
+                <option value="">Select Category</option>
+                <option value="Tech">Tech</option><option value="News">News</option><option value="Vlog">Vlog</option>
+                <option value="Gaming">Gaming</option><option value="Travel">Travel</option><option value="Entertainment">Entertainment</option>
+                <option value="Movie">Movie</option><option value="Natok">Natok</option><option value="Funny">Funny</option>
+                <option value="Sports">Sports</option><option value="Food & Recipe">Food & Recipe</option><option value="Education">Education</option>
+                <option value="Islamic">Islamic</option><option value="Life Style">Life Style</option><option value="Business & Money">Business & Money</option>
+                <option value="Freelancing">Freelancing</option>
+            </select>
+
+            <div class="progress" id="progressBar"><div class="progress-bar" id="progress"></div></div>
+            <button id="postBtn" disabled>Share 🚀</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+          <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+    <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
     </div>
 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    const firebaseConfig = {
-    apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
-    authDomain: "mybook-95b97.firebaseapp.com",
-    projectId: "mybook-95b97",
-    storageBucket: "mybook-95b97.firebasestorage.app",
-    messagingSenderId: "689741505296",
-    appId: "1:689741505296:web:818d83962a0825f64a7b95"
-};
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+    const app = initializeApp({ apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app" });
+    const db = getFirestore(app); const auth = getAuth(app);
+    const IMGBB_KEY = "fd8494417e28e4de2384f71202e82d27";
+    let compressedFile = null;
 
-// 👇 এইখানে বসাবেন
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "index.html";
-    }
-});
+    onAuthStateChanged(auth, (user) => {
+        if (!user) return window.location.href = "index.html";
+    });
 
-const IMGBB_KEY = "fd8494417e28e4de2384f71202e82d27";
-        window.checkForm = () => {
-            const cat = document.getElementById('category').value;
-            const img = document.getElementById('postImage').files[0];
-            document.getElementById('postBtn').disabled = !(cat && img);
-        };
-
-        document.getElementById('postImage').onchange = (e) => {
-    const file = e.target.files[0];
-
-    const reader = new FileReader();
-
-    reader.onload = (ev) => {
-        const img = document.getElementById('imagePreview');
-        img.src = ev.target.result;
-        img.style.display = 'block';
-
-        document.getElementById('placeholderText').style.display = 'none';
-
-        checkForm();
+    window.checkForm = () => {
+        const cat = document.getElementById('category').value;
+        document.getElementById('postBtn').disabled =!(cat && compressedFile);
     };
 
-    reader.readAsDataURL(file);
-};
-
-        document.getElementById('postBtn').onclick = async () => {
-    const file = document.getElementById('postImage').files[0];
-    const caption = document.getElementById('caption').value;
-    const category = document.getElementById('category').value;
-    const btn = document.getElementById('postBtn');
-     if (!auth.currentUser) {
-        alert("Please login first!");
-        window.location.href = "index.html";
-        return;
-    }
-
-    if (!file) {
-        alert("Please select an image!");
-        return;
-    }
-
-    if (!category) {
-        alert("Please select a category!");
-        return;
-    }
-    if (!caption.trim()) {
-    alert("Please write a caption!");
-    return;
-    }
-    btn.innerText = "Uploading...";
-    btn.disabled = true;
-
-    try {
-        const fd = new FormData();
-        fd.append("image", file);
-
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-            method: "POST",
-            body: fd
+    async function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = reject;
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = reject;
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let { width, height } = img;
+                    const MAX = 1280;
+                    if (width > MAX) { height *= MAX / width; width = MAX; }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        if(!blob) return reject("Canvas toBlob failed");
+                        // ✅ FIX: এখানে blob দিতে হবে
+                        const newFile = new File([blob], "compressed.webp", { type: "image/webp" });
+                        resolve(newFile);
+                    }, "image/webp", 0.75);
+                };
+            };
+            reader.readAsDataURL(file);
         });
+    }
 
-        const data = await res.json();
+    document.getElementById('postImage').onchange = async (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        document.getElementById('placeholderText').innerText = "Optimizing...";
 
-        if (!data.success) {
-            throw new Error("Image upload failed.");
+        try {
+            compressedFile = await compressImage(file);
+
+            // ✅ FIX: Preview দেখানোর জন্য compress করা ফাইলের URL বানাও
+            const previewURL = URL.createObjectURL(compressedFile);
+            const img = document.getElementById('imagePreview');
+            img.src = previewURL;
+            img.style.display = 'block';
+            document.getElementById('previewBox').classList.add('has-image');
+            document.getElementById('placeholderText').style.display = 'none';
+            document.getElementById('fileSize').innerText = `${(compressedFile.size/1024).toFixed(1)} KB • WebP`;
+            checkForm();
+        } catch(err) {
+            alert("Image Error: " + err);
+            document.getElementById('placeholderText').innerText = "Tap to add photo";
         }
+    };
 
-        const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
-const userData = userSnap.data();
-
-await addDoc(collection(db, "posts"), {
+    document.getElementById('postBtn').onclick = async () => {
+        const caption = document.getElementById('caption').value;
+        const category = document.getElementById('category').value;
+        const btn = document.getElementById('postBtn');
+        btn.innerText = "Posting..."; btn.disabled = true;
+        document.getElementById('progressBar').style.display = 'block';
+        try {
+            const fd = new FormData(); fd.append("image", compressedFile);
+            document.getElementById('progress').style.width = '50%';
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+            const data = await res.json();
+            if (!data.success) throw new Error("Image upload failed.");
+            document.getElementById('progress').style.width = '85%';
+            const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
+            const userData = userSnap.data();
+           const postRef = await addDoc(collection(db, "posts"), {
     uid: auth.currentUser.uid,
     userName: userData.name,
     userPhoto: userData.profile,
     imageUrl: data.data.url,
     caption: caption,
     category: category,
+    privacy: "public",
+    isMonetized: userData.isMonetized || false,
     createdAt: serverTimestamp(),
     likes: [],
-    comments: []
+    views: [],
+    commentsCount: 0
 });
 
-        alert("Post uploaded successfully!");
-        window.location.href = "profile.html";
+const newPostId = postRef.id;
 
-    } catch (err) {
-        alert("Upload failed: " + err.message);
-        btn.innerText = "Post Now";
-        btn.disabled = false;
-    }
-};
+const followers = userData.followers || [];
+
+for (const followerId of followers) {
+    await addDoc(collection(db, "notifications"), {
+        to: followerId,
+        type: "new_post",
+        from: auth.currentUser.uid,
+        fromName: userData.name,
+        fromPhoto: userData.profile,
+        text: "uploaded a new post",
+        postId: newPostId,
+        read: false,
+        createdAt: serverTimestamp()
+    });
+}
+            document.getElementById('progress').style.width = '100%';
+            setTimeout(() => window.location.href = "home.html", 300);
+        } catch (err) {
+            alert("Upload failed: " + err.message);
+            btn.innerText = "Share 🚀"; btn.disabled = false;
+            document.getElementById('progressBar').style.display = 'none';
+        }
+    };
     </script>
 </body>
 </html>
