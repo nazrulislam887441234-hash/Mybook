@@ -345,44 +345,34 @@ window.handleLike = async (postId, isDoubleTap = false) => {
     const postRef = doc(db, "posts", postId);
     const btn = document.getElementById(`likeBtn-${postId}`);
     const postSnap = await getDoc(postRef);
-    const likes = postSnap.data().likes || [];
+    const postData = postSnap.data(); // ✅ postData আগে নাও
+    const likes = postData.likes || [];
     let isLikedNow = likes.includes(currentUserId);
 
     if (!isLikedNow) {
-
-        await updateDoc(postRef, {
-            likes: arrayUnion(currentUserId)
-        });
+        await updateDoc(postRef, { likes: arrayUnion(currentUserId) });
 
         // Notification পাঠাও
-        const postData = postSnap.data();
-
         if (postData.uid !== currentUserId) {
             const mySnap = await getDoc(doc(db, "users", currentUserId));
             const myData = mySnap.data();
-
             await addDoc(collection(db, "notifications"), {
                 to: postData.uid,
                 type: "like",
                 from: currentUserId,
-                fromName: myData.name,
-                fromPhoto: myData.profile,
+                fromName: myData.userName,
+                fromPhoto: myData.userPhoto,
                 text: "liked your post",
                 postId: postId,
                 read: false,
                 createdAt: serverTimestamp()
             });
         }
-
         isLikedNow = true;
         document.getElementById("likeSound").play();
 
     } else if (!isDoubleTap) {
-
-        await updateDoc(postRef, {
-            likes: arrayRemove(currentUserId)
-        });
-
+        await updateDoc(postRef, { likes: arrayRemove(currentUserId) });
         isLikedNow = false;
     }
 
@@ -390,7 +380,6 @@ window.handleLike = async (postId, isDoubleTap = false) => {
     btn.innerHTML = `<i class="${isLikedNow ? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> Like`;
 
     const newCount = isLikedNow ? likes.length + 1 : likes.length - 1;
-
     document.getElementById(`likeCount-${postId}`).innerHTML =
     `<i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${newCount}`;
 };
@@ -427,15 +416,15 @@ window.followUser = async (uid) => {
 
         // Follow Notification পাঠাও
         await addDoc(collection(db, "notifications"), {
-            to: uid,
-            type: "follow",
-            from: currentUserId,
-            fromName: myData.name,
-            fromPhoto: myData.profile,
-            text: "started following you",
-            read: false,
-            createdAt: serverTimestamp()
-        });
+    to: uid,
+    type: "follow",
+    from: currentUserId,
+    fromName: myData.userName,      // ✅ ঠিক
+    fromPhoto: myData.userPhoto,    // ✅ ঠিক
+    text: "started following you",
+    read: false,
+    createdAt: serverTimestamp()
+});
 
         btn.innerText = "Following";
         btn.style.background = "#ccc";
