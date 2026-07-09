@@ -7,127 +7,137 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+        :root{
+            --primary: #7C3AED;
+            --primary-dark: #5B21B6;
+            --accent: #FBBF24;
+            --bg-dark: #0F0B1E;
+            --card: rgba(22, 18, 42, 0.7);
+            --text: #FFFFFF;
+            --text-muted: rgba(255,255,255,0.6);
+            --border: rgba(124,58,237,0.3);
+        }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Hind Siliguri', sans-serif;
-            background: #000;
-            margin: 0; min-height: 100vh; padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            background: var(--bg-dark);
+            margin: 0; min-height: 100vh; padding-bottom: calc(90px + env(safe-area-inset-bottom));
+            color: var(--text);
         }
 
- .bg {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        animation: colorChange 1s infinite alternate; z-index: -1;
-    }
-    @keyframes colorChange {
-        0%{background: linear-gradient(135deg, #667eea, #764ba2)}
-        25%{background: linear-gradient(135deg, #f093fb, #f5576c)}
-        50%{background: linear-gradient(135deg, #4facfe, #00f2fe)}
-        75%{background: linear-gradient(135deg, #43e97b, #38f9d7)}
-        100%{background: linear-gradient(135deg, #fa709a, #fee140)}
-     }
+       .bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 20%, rgba(124,58,237,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(251,191,36,0.1) 0%, transparent 50%),
+                        var(--bg-dark);
+            z-index: -1;
+        }
 
- .post-container {
-        width: 100%; max-width: 540px; margin: 0 auto;
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(40px) saturate(180%);
-        -webkit-backdrop-filter: blur(40px) saturate(180%);
-        border: 1px solid rgba(255,255,255,0.15);
-        min-height: 100vh; border-radius: 0;
-        box-shadow: 0 0 60px rgba(0,0,0,0.5);
-        animation: fadeIn 0.5s ease;
-     }
-     @media (min-width: 768px) {.post-container { border-radius: 30px; margin: 20px auto; min-height: calc(100vh - 40px); } }
-     @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+       .post-container {
+            width: 100%; max-width: 540px; margin: 0 auto;
+            background: var(--card);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--border);
+            min-height: 100vh; border-radius: 0;
+            box-shadow: 0 0 80px rgba(124,58,237,0.2);
+            animation: fadeIn 0.6s ease;
+        }
+        @media (min-width: 768px) {.post-container { border-radius: 32px; margin: 30px auto; min-height: calc(100vh - 60px); border: 1px solid var(--border); } }
+        @keyframes fadeIn { from {opacity:0; transform: translateY(10px)} to {opacity:1; transform: translateY(0)} }
 
- .header {
-        padding: 18px 20px; display: flex; align-items: center; justify-content: space-between;
-        background: rgba(0,0,0,0.2); backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(255,255,255,0.1); color: white;
-        position: sticky; top: 0; z-index: 10;
-        padding-top: calc(18px + env(safe-area-inset-top));
-     }
- .header-left { display: flex; align-items: center; gap: 15px; }
- .header i {
-        font-size: 20px; cursor: pointer;
-        background: rgba(255,255,255,0.15); width: 38px; height: 38px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; transition: 0.2s;
-     }
- .header i:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
- .header h3 { margin: 0; font-size: 18px; font-weight: 700; }
- .draft-btn { font-size: 15px; color: #00d4ff; font-weight: 600; cursor: pointer; }
+       .header {
+            padding: 18px 20px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(15,11,30,0.6); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); color: var(--text);
+            position: sticky; top: 0; z-index: 10;
+            padding-top: calc(18px + env(safe-area-inset-top));
+        }
+       .header-left { display: flex; align-items: center; gap: 15px; }
+       .header i {
+            font-size: 20px; cursor: pointer;
+            background: rgba(124,58,237,0.2); width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 14px; transition: 0.3s; border: 1px solid var(--border);
+        }
+       .header i:active { transform: scale(0.9); background: rgba(124,58,237,0.4); }
+       .header h3 { margin: 0; font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #FBBF24, #7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+       .draft-btn { font-size: 15px; color: var(--accent); font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 12px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); }
 
- .content { padding: 20px; }
+       .content { padding: 24px; }
 
- .preview-box {
-        width: 100%; height: 320px;
-        border: 2px dashed rgba(255,255,255,0.25);
-        border-radius: 25px; display: flex; align-items: center; justify-content: center;
-        margin-bottom: 20px; cursor: pointer; overflow: hidden;
-        background: rgba(255,255,255,0.05);
-        flex-direction: column; color: rgba(255,255,255,0.7);
-        transition: all 0.3s cubic-bezier(.4,0,.2,1);
-     }
- .preview-box:active { transform: scale(0.98); }
- .preview-box.has-image { border-style: solid; border-color: rgba(255,255,255,0.4); }
- .preview-box img { width: 100%; height: 100%; object-fit: cover; }
- .preview-box i { font-size: 55px; margin-bottom: 12px; }
- .preview-box.text { font-size: 16px; font-weight: 600; }
- .preview-box.size { font-size: 12px; margin-top: 8px; color: #00ff88; font-weight: 700; }
+       .preview-box {
+            width: 100%; height: 340px;
+            border: 2px dashed var(--border);
+            border-radius: 24px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px; cursor: pointer; overflow: hidden;
+            background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(251,191,36,0.05));
+            flex-direction: column; color: var(--text-muted);
+            transition: all 0.4s cubic-bezier(.4,0,.2,1);
+        }
+       .preview-box:active { transform: scale(0.98); }
+       .preview-box:hover { border-color: var(--primary); box-shadow: 0 0 30px rgba(124,58,237,0.3); }
+       .preview-box.has-image { border-style: solid; border-color: var(--primary); }
+       .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+       .preview-box i { font-size: 60px; margin-bottom: 12px; color: var(--primary); }
+       .preview-box.text { font-size: 17px; font-weight: 700; color: var(--text); }
+       .preview-box.size { font-size: 13px; margin-top: 8px; color: var(--accent); font-weight: 700; }
 
         input, select, textarea {
-            width: 100%; padding: 15px 18px; margin-bottom: 15px;
-            border: 1.5px solid rgba(255,255,255,0.15);
-            border-radius: 18px; outline: none; font-size: 16px;
-            background: rgba(255,255,255,0.08); color: white;
+            width: 100%; padding: 16px 20px; margin-bottom: 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 16px; outline: none; font-size: 16px;
+            background: rgba(124,58,237,0.08); color: var(--text);
             backdrop-filter: blur(20px); font-family: 'Hind Siliguri', sans-serif;
+            transition: 0.3s;
         }
-        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.5); }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
         select option { color: black; background: white; }
         input:focus, select:focus, textarea:focus {
-            border-color: #00d4ff; background: rgba(255,255,255,0.12);
+            border-color: var(--primary); background: rgba(124,58,237,0.15);
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.2);
         }
 
         #postBtn {
-            width: 100%; padding: 17px;
-            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-            color: white; border: none; border-radius: 20px;
-            font-weight: 700; cursor: pointer; font-size: 17px;
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
-            transition: all 0.2s cubic-bezier(.4,0,.2,1);
-            margin-bottom: 10px;
+            width: 100%; padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; border: none; border-radius: 18px;
+            font-weight: 700; cursor: pointer; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(124,58,237,0.4);
+            transition: all 0.3s cubic-bezier(.4,0,.2,1);
+            margin-bottom: 10px; letter-spacing: 0.5px;
         }
         #postBtn:active:not(:disabled) { transform: scale(0.97); }
-        #postBtn:disabled { background: rgba(255,255,255,0.1); cursor: not-allowed; box-shadow: none; color: rgba(255,255,255,0.4); }
+        #postBtn:hover:not(:disabled) { box-shadow: 0 15px 40px rgba(124,58,237,0.6); }
+        #postBtn:disabled { background: rgba(255,255,255,0.08); cursor: not-allowed; box-shadow: none; color: var(--text-muted); }
 
-  .progress {
-        height: 5px; background: rgba(255,255,255,0.15);
-        border-radius: 10px; margin-top: 12px; overflow: hidden; display: none;
-      }
-  .progress-bar {
-        height: 100%; width: 0%;
-        background: linear-gradient(90deg, #00ff88, #00d4ff);
-        transition: 0.3s; border-radius: 10px;
-      }
+       .progress {
+            height: 6px; background: rgba(124,58,237,0.2);
+            border-radius: 10px; margin-top: 14px; overflow: hidden; display: none;
+        }
+       .progress-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transition: 0.3s; border-radius: 10px;
+        }
 
- .bottom-nav {
-        position: fixed; bottom: 0; left: 0; width: 100%;
-        background: rgba(0,0,0,0.3); backdrop-filter: blur(40px) saturate(180%);
-        -webkit-backdrop-filter: blur(40px) saturate(180%);
-        border-top: 1px solid rgba(255,255,255,0.1);
-        display: flex; justify-content: space-around; align-items: center;
-        padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-        z-index: 100;
-     }
- .nav-item {
-        flex: 1; text-align: center; color: rgba(255,255,255,0.5);
-        font-size: 24px; cursor: pointer; transition: 0.2s;
-        display: flex; flex-direction: column; align-items: center; gap: 4px;
-     }
- .nav-item:active { transform: scale(0.9); }
- .nav-item.active { color: #00d4ff; }
- .nav-item span { font-size: 10px; font-weight: 600; }
+       .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(15,11,30,0.8); backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+       .nav-btn {
+            flex: 1; text-align: center; color: var(--text-muted);
+            font-size: 22px; cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+       .nav-btn:active { transform: scale(0.9); }
+       .nav-btn.active,.nav-btn:hover { color: var(--accent); }
+       .nav-btn span { font-size: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -135,7 +145,7 @@
     <div class="post-container">
         <div class="header">
             <div class="header-left">
-                <i class="fa-arrow-left" onclick="window.location.href='post.html'"></i>
+                <i class="fa-solid fa-arrow-left" onclick="window.location.href='post.html'"></i>
                 <h3>New Post</h3>
             </div>
             <div class="draft-btn">Draft</div>
@@ -145,15 +155,15 @@
             <input type="file" id="postImage" hidden accept="image/*">
             <div class="preview-box" id="previewBox" onclick="document.getElementById('postImage').click()">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span class="text" id="placeholderText">Tap to add photo</span>
+                <span class="text" id="placeholderText">ছবি যোগ করতে ট্যাপ করুন</span>
                 <img id="imagePreview" style="display:none;">
                 <div class="size" id="fileSize"></div>
             </div>
 
-            <textarea id="caption" placeholder="Write a caption... ✨" rows="4"></textarea>
+            <textarea id="caption" placeholder="ক্যাপশন লিখুন... ✨" rows="4"></textarea>
 
             <select id="category" onchange="checkForm()">
-                <option value="">Select Category</option>
+                <option value="">ক্যাটাগরি সিলেক্ট করুন</option>
                 <option value="Tech">Tech</option><option value="News">News</option><option value="Vlog">Vlog</option>
                 <option value="Gaming">Gaming</option><option value="Travel">Travel</option><option value="Entertainment">Entertainment</option>
                 <option value="Movie">Movie</option><option value="Natok">Natok</option><option value="Funny">Funny</option>
@@ -168,12 +178,12 @@
     </div>
 
     <div class="bottom-nav">
-          <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i></div>
-    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
-    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
-    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
-    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
-    <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
+        <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-btn active" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i><span>Post</span></div>
+        <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i><span>Profile</span></div>
+        <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i><span>Stats</span></div>
+        <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i><span>Shop</span></div>
+        <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i><span>Alert</span></div>
     </div>
 
     <script type="module">
@@ -213,7 +223,6 @@
                     ctx.drawImage(img, 0, 0, width, height);
                     canvas.toBlob((blob) => {
                         if(!blob) return reject("Canvas toBlob failed");
-                        // ✅ FIX: এখানে blob দিতে হবে
                         const newFile = new File([blob], "compressed.webp", { type: "image/webp" });
                         resolve(newFile);
                     }, "image/webp", 0.75);
@@ -229,8 +238,6 @@
 
         try {
             compressedFile = await compressImage(file);
-
-            // ✅ FIX: Preview দেখানোর জন্য compress করা ফাইলের URL বানাও
             const previewURL = URL.createObjectURL(compressedFile);
             const img = document.getElementById('imagePreview');
             img.src = previewURL;
@@ -246,60 +253,68 @@
     };
 
     document.getElementById('postBtn').onclick = async () => {
-        const caption = document.getElementById('caption').value;
-        const category = document.getElementById('category').value;
-        const btn = document.getElementById('postBtn');
-        btn.innerText = "Posting..."; btn.disabled = true;
-        document.getElementById('progressBar').style.display = 'block';
-        try {
-            const fd = new FormData(); fd.append("image", compressedFile);
-            document.getElementById('progress').style.width = '50%';
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-            const data = await res.json();
-            if (!data.success) throw new Error("Image upload failed.");
-            document.getElementById('progress').style.width = '85%';
-            const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
-            const userData = userSnap.data();
-           const postRef = await addDoc(collection(db, "posts"), {
-    uid: auth.currentUser.uid,
-    userName: userData.name,
-    userPhoto: userData.profile,
-    imageUrl: data.data.url,
-    caption: caption,
-    category: category,
-    privacy: "public",
-    isMonetized: userData.isMonetized || false,
-    createdAt: serverTimestamp(),
-    likes: [],
-    views: [],
-    commentsCount: 0
-});
+    const caption = document.getElementById('caption').value;
+    const category = document.getElementById('category').value;
+    const btn = document.getElementById('postBtn');
+    btn.innerText = "Posting...";
+    btn.disabled = true;
+    document.getElementById('progressBar').style.display = 'block';
 
-const newPostId = postRef.id;
+    try {
+        const fd = new FormData();
+        fd.append("image", compressedFile);
+        document.getElementById('progress').style.width = '50%';
 
-const followers = userData.followers || [];
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+        const data = await res.json();
+        if (!data.success) throw new Error("Image upload failed.");
+        document.getElementById('progress').style.width = '85%';
 
-for (const followerId of followers) {
-    await addDoc(collection(db, "notifications"), {
-        to: followerId,
-        type: "new_post",
-        from: auth.currentUser.uid,
-        fromName: userData.name,
-        fromPhoto: userData.profile,
-        text: "uploaded a new post",
-        postId: newPostId,
-        read: false,
-        createdAt: serverTimestamp()
-    });
-}
-            document.getElementById('progress').style.width = '100%';
-            setTimeout(() => window.location.href = "home.html", 300);
-        } catch (err) {
-            alert("Upload failed: " + err.message);
-            btn.innerText = "Share 🚀"; btn.disabled = false;
-            document.getElementById('progressBar').style.display = 'none';
+        const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
+        const userData = userSnap.data();
+
+        const postRef = await addDoc(collection(db, "posts"), {
+            uid: auth.currentUser.uid,
+            userName: userData.userName,
+            userPhoto: userData.userPhoto,
+            imageUrl: data.data.url,
+            caption: caption,
+            category: category,
+            privacy: "public",
+            isMonetized: userData.isMonetized || false,
+            createdAt: serverTimestamp(),
+            likes: [],
+            views: [],
+            commentsCount: 0
+        });
+
+        const newPostId = postRef.id;
+        const followers = userData.followers || [];
+
+        for (const followerId of followers) {
+            await addDoc(collection(db, "notifications"), {
+                to: followerId,
+                type: "new_post",
+                from: auth.currentUser.uid,
+                fromName: userData.userName,
+                fromPhoto: userData.userPhoto,
+                text: "uploaded a new post",
+                postId: newPostId,
+                read: false,
+                createdAt: serverTimestamp()
+            });
         }
-    };
+
+        document.getElementById('progress').style.width = '100%';
+        setTimeout(() => window.location.href = "home.html", 300);
+
+    } catch (err) {
+        alert("Upload failed: " + err.message);
+        btn.innerText = "Share 🚀";
+        btn.disabled = false;
+        document.getElementById('progressBar').style.display = 'none';
+    }
+};
     </script>
 </body>
 </html>
