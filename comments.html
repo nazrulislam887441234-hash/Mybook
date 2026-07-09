@@ -182,8 +182,8 @@ async function sendNotification(toUid, type, text, commentId = null) {
     await addDoc(collection(db, "notifications"), {
         to: toUid,
         from: currentUserId,
-        fromName: userData.name || userData.userName || "User",
-        fromPhoto: userData.profile || userData.userPhoto || DEFAULT_AVATAR,
+        fromName: userData.userName || "User",      // ✅ শুধু userName
+        fromPhoto: userData.userPhoto || DEFAULT_AVATAR, // ✅ শুধু userPhoto
         type: type,
         text: text,
         postId: postId,
@@ -201,12 +201,17 @@ window.postComment = async (replyTo = null, replyToUid = null, replyToName = nul
     const userData = userDoc.data();
     const finalText = replyTo ? `@${replyToName} ${text}` : text;
     const newComment = {
-        id: Date.now().toString(), text: finalText, uid: currentUserId,
-        userName: userData.name || userData.userName || "User",
-        userPhoto: userData.profile || userData.userPhoto || DEFAULT_AVATAR,
-        timestamp: Date.now(), replyTo: replyTo, replyToUid: replyToUid,
-        likes: [], isEdited: false
-    };
+    id: Date.now().toString(), 
+    text: finalText, 
+    uid: currentUserId,
+    userName: userData.userName || "User",      // ✅
+    userPhoto: userData.userPhoto || DEFAULT_AVATAR, // ✅
+    timestamp: Date.now(), 
+    replyTo: replyTo, 
+    replyToUid: replyToUid,
+    likes: [], 
+    isEdited: false
+};
     try {
         const postRef = doc(db, "posts", postId);
         await runTransaction(db, async (transaction) => {
@@ -260,11 +265,10 @@ window.toggleLike = async (commentId, commentUid) => {
         if(shouldSendNoti) {
     const myData = await getDoc(doc(db,"users",currentUserId));
     const me = myData.data();
-
     await sendNotification(
         commentUid,
         "like",
-        `${me.name || me.userName} liked your comment`,
+        `${me.userName} liked your comment`, // ✅
         commentId
     );
 }
