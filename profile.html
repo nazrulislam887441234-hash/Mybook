@@ -9,105 +9,233 @@
 
 <style>
 * { box-sizing: border-box; }
-body { font-family: sans-serif; background: #f9f9f9; margin: 0; display: flex; justify-content: center; padding-bottom:80px; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom:80px; }
+
+/* ===== HEADER - HOME PAGE ER MOTO ===== */
+header { 
+    background: white; 
+    padding: 10px 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+}
+.logo { 
+    font-size: 20px; 
+    font-weight: bold; 
+    color: #007bff; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+.header-links { display: flex; gap: 6px; }
+.header-links a { 
+    padding: 6px 10px; 
+    background: #f0f2f5; 
+    color: #007bff; 
+    text-decoration: none; 
+    border-radius: 15px; 
+    font-size: 12px; 
+    font-weight: bold; 
+}
+.header-links a:hover { background: #007bff; color: white; }
 
 .container {
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     background: white;
-    min-height: 100vh;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    padding-bottom: 20px;
+    margin: 0 auto;
+    min-height: calc(100vh - 130px);
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
 }
 
-.cover { width: 100%; height: 160px; background-size: cover; background-position: center; background-color: #eee; }
-
-.avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    margin: -60px auto 10px;
-    border: 4px solid white;
-    display: block;
-    object-fit: cover;
+.cover{
+    width:320px;
+    height:100px;
+    margin:0 auto;
+    background-size:100% 100%;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color:#eee;
+    border-radius:10px;
 }
 
-.user-info { text-align: center; padding: 0 20px; }
+.avatar{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    margin:-35px auto 10px; /* আগে ছিল -50px */
+    border:5px solid white;
+    display:block;
+    object-fit:contain;
+    background:#fff;
+    box-shadow:0 8px 25px rgba(0,0,0,.3);
+}
 
-.btn-post, .btn-logout {
-    width: 90%;
-    padding: 12px;
+.user-info { text-align: center; padding: 0 20px 20px; }
+.user-info h2 { margin: 10px 0 5px; font-size: 26px; font-weight: 700; }
+
+.badge-monetize {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.badge-on { background: linear-gradient(45deg, #28a745, #20c997); color: white; }
+.badge-off { background: linear-gradient(45deg, #dc3545, #e83e8c); color: white; }
+
+.btn-group { display: flex; gap: 10px; padding: 0 20px; margin-top: 15px; }
+.btn-post, .btn-dashboard, .btn-logout {
+    flex: 1;
+    padding: 14px;
     border: none;
     border-radius: 25px;
     font-weight: bold;
     cursor: pointer;
     display: block;
-    margin: 10px auto;
+    font-size: 15px;
+    transition: all 0.3s;
 }
+.btn-post { background: linear-gradient(45deg, #007bff, #00d4ff); color: white; }
+.btn-post:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,123,255,0.4); }
+.btn-dashboard { background: linear-gradient(45deg, #28a745, #20c997); color: white; }
+.btn-dashboard:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40,167,69,0.4); }
+.btn-logout { background: linear-gradient(45deg, #dc3545, #fd7e14); color: white; width: 90%; margin: 15px auto; }
+.btn-logout:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220,53,69,0.4); }
 
-.btn-post { background: #007bff; color: white; }
-.btn-logout { background: red; color: white; }
+.post-card { 
+    border-top: 1px solid #eee; 
+    padding: 15px; 
+    background: white;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+}
+.post-card:hover { background: #fafafa; }
 
-.post-card { border-top: 1px solid #eee; padding: 15px; }
+.post-img { width:100%; border-radius:12px; margin-top:10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
 
 .stats {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
     margin: 10px 0;
     display: flex;
-    gap: 15px;
+    gap: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
+.actions { display: flex; gap: 10px; }
 .btn-action {
-    padding: 6px 12px;
-    border-radius: 5px;
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    font-size: 12px;
-    background: #eee;
+    font-size: 14px;
+    font-weight: 600;
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
 }
+.btn-action:hover { background: #e4e6eb; transform: scale(1.02); }
+.btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.loading { text-align:center; padding:40px; color:#777; }
+
+/* ===== BOTTOM NAV - HOME PAGE ER MOTO ===== */
+.nav-bar { 
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+    max-width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white; 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 12px 0; 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+    z-index: 99; 
+    border-radius: 20px 20px 0 0;
+}
+.nav-btn { font-size: 22px; cursor: pointer; color: #555; transition: all 0.2s; }
+.nav-btn:hover { color: #007bff; transform: scale(1.1); }
+.nav-btn.active { color: #007bff; }
 </style>
 </head>
 
 <body>
 
+<!-- ===== TOP HEADER ===== -->
+<header>
+    <div class="logo"><img src="https://i.ibb.co.com/FqYZrjH3/20260609-103856.png" width="30"> My Book</div>
+    <div class="header-links">
+        <a href="terms&condition.html">Terms</a>
+        <a href="privacy-policy.html">Privacy</a>
+        <a href="support.html">Support</a>
+    </div>
+</header>
+
 <div class="container">
 
 <div class="cover" id="coverImg"></div>
-<img class="avatar" id="profileImg">
+<img class="avatar" id="profileImg" src="https://via.placeholder.com/140">
 
 <div class="user-info">
     <h2 id="userName">Loading...</h2>
+    
+    <!-- Monetize Status -->
+    <div id="monetizeStatus"></div>
 
-    <!-- 🔥 FIXED FOLLOWERS -->
-    <p>
-        Followers:
-        <span id="followerCount">0</span>
+    <p style="color:#666; font-size:15px;">
+        <i class="fa-solid fa-users"></i> Followers: <b id="followerCount">0</b>
     </p>
 
-    <button class="btn-post" onclick="window.location.href='post.html'">Create New Post</button>
-    <button class="btn-logout" id="logoutBtn">Logout</button>
+    <div class="btn-group">
+        <button class="btn-post" onclick="window.location.href='post.html'">
+            <i class="fa-solid fa-plus"></i> Create Post
+        </button>
+        <button class="btn-dashboard" onclick="window.location.href='dashboard.html'">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </button>
+
+        <button class="btn-dashboard" onclick="window.location.href='boost.html'">
+            <i class="fa-solid fa-rocket"></i> Boost Post
+        </button>
+
+    </div>
+    <button class="btn-logout" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
 </div>
 
-<div id="postsList"></div>
+<div id="postsList"><p class="loading">Loading Posts...</p></div>
 
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<div class="nav-bar">
+     <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+     <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-    getAuth, onAuthStateChanged, signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import { 
-    getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, arrayUnion, arrayRemove, increment 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const app = initializeApp({
     apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
@@ -120,7 +248,6 @@ const app = initializeApp({
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 let currentUser;
 
 /* ================= LOGOUT ================= */
@@ -135,46 +262,111 @@ onAuthStateChanged(auth, async (user) => {
         window.location.href = "index.html";
         return;
     }
-
     currentUser = user;
-
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-        const data = userSnap.data();
-
-        document.getElementById("userName").innerText = data.name || "User";
-        document.getElementById("profileImg").src = data.profile || "";
-        document.getElementById("coverImg").style.backgroundImage = `url(${data.cover || ''})`;
-
-        // 🔥 SAFE FOLLOWERS FIX
-        const followers = data.followers || [];
-        document.getElementById("followerCount").innerText = followers.length;
-    }
-
+    await loadProfile(user.uid);
     loadPosts(user.uid);
 });
 
+async function loadProfile(uid) {
+    try {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+
+        console.log("Current UID:", uid);
+
+        if (!userSnap.exists()) {
+            console.log("User document not found!");
+            document.getElementById("userName").innerText = "User Not Found";
+            return;
+        }
+
+        const data = userSnap.data();
+        console.log(data);
+
+        // নাম
+        document.getElementById("userName").textContent =
+            data.userName || "No Name";
+
+        // প্রোফাইল ছবি
+        document.getElementById("profileImg").src =
+            data.userPhoto || "https://via.placeholder.com/140";
+
+        // কভার ছবি
+        if (data.coverPhoto) {
+            document.getElementById("coverImg").style.backgroundImage =
+                `url('${data.coverPhoto}')`;
+        }
+
+        // Followers
+        document.getElementById("followerCount").textContent =
+            (data.followers || []).length;
+
+        // Monetize
+        document.getElementById("monetizeStatus").innerHTML =
+            data.isMonetized
+                ? `<span class="badge-monetize badge-on"><i class="fa-solid fa-circle-check"></i> Monetized ON</span>`
+                : `<span class="badge-monetize badge-off"><i class="fa-solid fa-circle-xmark"></i> Monetized OFF</span>`;
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+}
 /* ================= LOAD POSTS ================= */
 async function loadPosts(uid) {
     const q = query(collection(db, "posts"), where("uid", "==", uid));
     const snap = await getDocs(q);
+    
+    if(snap.empty){
+        document.getElementById("postsList").innerHTML = `<p class="loading">আপনি এখনো কোনো পোস্ট করেননি</p>`;
+        return;
+    }
 
+    document.getElementById("postsList").innerHTML = "";
     snap.forEach((d) => {
         const post = d.data();
+        const postId = d.id;
+        const likeCount = post.likes?.length || 0;
+        const commentCount = post.commentsCount || 0;
+        const viewCount = post.views?.length || 0;
 
         document.getElementById("postsList").innerHTML += `
-        <div class="post-card">
-            <img src="${post.imageUrl}" style="width:100%;border-radius:10px;">
-            <p>${post.caption || ""}</p>
+        <div class="post-card" id="post-${postId}">
+            <img src="${post.imageUrl}" class="post-img">
+            <p style="font-size:15px; margin:10px 0;">${post.caption || ""}</p>
 
             <div class="stats">
-                <span>❤️ ${post.likes?.length || 0}</span>
-                <span>💬 ${post.comments?.length || 0}</span>
-                <span>👁️ ${post.views || 0}</span>
+                <span><i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${likeCount} Likes</span>
+                <span><i class="fa-solid fa-eye"></i> ${viewCount} Views</span>
+            </div>
+
+            <div class="actions">
+                <button class="btn-action" disabled>
+                    <i class="fa-solid fa-ban"></i> Own Post
+                </button>
+                <button class="btn-action" onclick="window.location.href='comments.html?id=${postId}'">
+                    <i class="fa-regular fa-comment"></i> ${commentCount} Comment
+                </button>
             </div>
         </div>`;
+        
+        // ✅ Live View Count Update
+        listenToViewCount(postId);
+    });
+}
+
+function listenToViewCount(postId){
+    const postRef = doc(db, "posts", postId);
+    onSnapshot(postRef, (docSnap) => {
+        if(docSnap.exists()){
+            const data = docSnap.data();
+            const realViewCount = data.views?.length || 0;
+            const postEl = document.getElementById(`post-${postId}`);
+            if(postEl){
+                const statsSpan = postEl.querySelector('.stats span:nth-child(2)');
+                if(statsSpan) statsSpan.innerHTML = `<i class="fa-solid fa-eye"></i> ${realViewCount} Views`;
+            }
+        }
     });
 }
 
