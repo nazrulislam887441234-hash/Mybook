@@ -68,8 +68,24 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, query, where, orderBy, limit, startAfter, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+    import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove, 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  startAfter, 
+  getDocs, 
+  onSnapshot,
+  addDoc, // ✅ এটা add করো
+  serverTimestamp // ✅ এটা add করো
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     const db = getFirestore(initializeApp({ apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" }));
     const auth = getAuth();
     const targetUid = new URLSearchParams(window.location.search).get('uid');
@@ -88,28 +104,50 @@
     async function loadAds(){ const adsSnap = await getDocs(collection(db, "ads")); adsData = []; adsSnap.forEach(doc => adsData.push({id: doc.id,...doc.data()})); }
 
     async function loadProfile() {
-        const userSnap = await getDoc(doc(db, "users", targetUid));
-        if (userSnap.exists()) {
-            const data = userSnap.data();
-            document.getElementById('name').innerText = data.name || "Unknown User";
-            document.getElementById('email').innerText = data.email || "";
-            document.getElementById('avatar').src = data.profile || "https://i.ibb.co/QvVQh4y/default-avatar.png";
-            document.getElementById('banner').src = data.cover || 'https://via.placeholder.com/400x140/667eea/ffffff?text=Cover';
-            const followers = data.followers || []; const following = data.following || [];
-            document.getElementById('followersCount').innerText = followers.length;
-            document.getElementById('followingCount').innerText = following.length;
-            const btn = document.getElementById('followBtn'); const isFollowing = followers.includes(currentUser.uid);
-            btn.innerText = isFollowing? "Following" : "Follow";
-            btn.style.background = isFollowing? "#e4e6eb" : "#007bff"; btn.style.color = isFollowing? "black" : "white";
-        }
+    const userSnap = await getDoc(doc(db, "users", targetUid));
+    if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById('name').innerText = data.userName || "Unknown User"; // ✅ userName
+        document.getElementById('email').innerText = data.email || "";
+        document.getElementById('avatar').src = data.userPhoto || "https://i.ibb.co/QvVQh4y/default-avatar.png"; // ✅ userPhoto
+        document.getElementById('banner').src = data.coverPhoto || 'https://via.placeholder.com/400x140/667eea/ffffff?text=Cover'; // ✅ coverPhoto
+        const followers = data.followers || []; const following = data.following || [];
+        document.getElementById('followersCount').innerText = followers.length;
+        document.getElementById('followingCount').innerText = following.length;
+        const btn = document.getElementById('followBtn'); const isFollowing = followers.includes(currentUser.uid);
+        btn.innerText = isFollowing? "Following" : "Follow";
+        btn.style.background = isFollowing? "#e4e6eb" : "#007bff"; btn.style.color = isFollowing? "black" : "white";
     }
+}
 
     window.toggleFollow = async () => {
-        const btn = document.getElementById('followBtn'); const isFollowing = btn.innerText === "Following";
-        if (isFollowing) { await updateDoc(doc(db, "users", currentUser.uid), { following: arrayRemove(targetUid) }); await updateDoc(doc(db, "users", targetUid), { followers: arrayRemove(currentUser.uid) }); }
-        else { await updateDoc(doc(db, "users", currentUser.uid), { following: arrayUnion(targetUid) }); await updateDoc(doc(db, "users", targetUid), { followers: arrayUnion(currentUser.uid) }); }
-        await loadProfile();
-    };
+    const btn = document.getElementById('followBtn'); 
+    const isFollowing = btn.innerText === "Following";
+    const myData = await getDoc(doc(db, "users", currentUser.uid)); // ✅ নিজের ডাটা নাও
+    const me = myData.data();
+
+    if (isFollowing) { 
+        await updateDoc(doc(db, "users", currentUser.uid), { following: arrayRemove(targetUid) }); 
+        await updateDoc(doc(db, "users", targetUid), { followers: arrayRemove(currentUser.uid) }); 
+    }
+    else { 
+        await updateDoc(doc(db, "users", currentUser.uid), { following: arrayUnion(targetUid) }); 
+        await updateDoc(doc(db, "users", targetUid), { followers: arrayUnion(currentUser.uid) }); 
+        
+        // ✅ FOLLOW NOTIFICATION
+        await addDoc(collection(db, "notifications"), {
+            to: targetUid,
+            from: currentUser.uid,
+            fromName: me.userName || "User",
+            fromPhoto: me.userPhoto || "https://i.ibb.co/QvVQh4y/default-avatar.png",
+            type: "follow",
+            text: "started following you",
+            read: false,
+            createdAt: serverTimestamp()
+        });
+    }
+    await loadProfile();
+};
 
     window.loadPosts = async function() {
         if(isLoading ||!hasMore) return; isLoading = true;
