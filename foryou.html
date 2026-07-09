@@ -316,8 +316,15 @@ async function sendNotification(toUid, type, text, postId = null){
     const userSnap = await getDoc(doc(db,"users",currentUserId));
     const user = userSnap.data();
     await addDoc(collection(db,"notifications"),{
-        to: toUid, from: currentUserId, fromName: user.name || user.userName || "User",
-        fromPhoto: user.profile || user.userPhoto || "", type: type, text: text, postId: postId, read:false, createdAt: serverTimestamp()
+        to: toUid, 
+        from: currentUserId, 
+        fromName: user.userName || "User",      // ✅ ঠিক করলাম
+        fromPhoto: user.userPhoto || "",        // ✅ ঠিক করলাম
+        type: type, 
+        text: text, 
+        postId: postId, 
+        read:false, 
+        createdAt: serverTimestamp()
     });
 }
 
@@ -530,9 +537,9 @@ window.handleLike = async (postId, isDoubleTap = false) => {
 
     updateStatsUI(postId);
 
-    if(shouldSendNoti){
-        await sendNotification(postOwner, "like", `${(await getUserData(currentUserId)).name || "Someone"} liked your post`, postId);
-    }
+if(shouldSendNoti){
+    await sendNotification(postOwner, "like", `${(await getUserData(currentUserId)).userName || "Someone"} liked your post`, postId);
+}
 };
 
 // ✅ Transaction দিয়ে Follow
@@ -546,7 +553,7 @@ window.followUser = async (uid)=>{
         transaction.update(targetRef, { followers: arrayUnion(currentUserId) });
     });
     followingList.push(uid);
-    await sendNotification(uid, "follow", `${(await getUserData(currentUserId)).name || "Someone"} started following you`);
+    await sendNotification(uid, "follow", `${(await getUserData(currentUserId)).userName || "Someone"} started following you`); // ✅ ঠিক করলাম
 };
 
 window.addEventListener('scroll', () => {
