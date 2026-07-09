@@ -3,68 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Step 1</title>
+    <title>My Book - Create Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 20px; font-family: sans-serif; background: #f9f9f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 350px; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-        .logo { width: 120px; margin-bottom: 15px; }
-        input { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #ccc; border-radius: 25px; outline: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            margin: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px;
+        }
+        .container { 
+            width: 100%; 
+            max-width: 420px; 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 35px 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+            text-align: center; 
+            animation: slideUp 0.6s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo { 
+            width: 90px; 
+            height: 90px;
+            margin-bottom: 10px; 
+            border-radius: 20px;
+            object-fit: contain;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 16px;
+        }
+        input { 
+            width: 100%; 
+            padding: 15px 15px 15px 50px; 
+            border: 2px solid #eee; 
+            border-radius: 15px; 
+            outline: none; 
+            font-size: 15px;
+            transition: 0.3s;
+            background: #f9f9f9;
+        }
+        input:focus {
+            border-color: #667eea;
+            background: white;
+        }
         .pass-group { position: relative; }
-        .toggle-btn { position: absolute; right: 15px; top: 22px; cursor: pointer; font-size: 14px; color: #888; }
-        .date-group { display: flex; gap: 5px; margin: 10px 0; }
-        .date-group input { flex: 1; text-align: center; }
-        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .links { margin-top: 15px; font-size: 13px; color: #555; }
-        .links a { color: red; text-decoration: none; font-weight: bold; }
+        .toggle-btn { 
+            position: absolute; 
+            right: 18px; 
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer; 
+            font-size: 16px; 
+            color: #aaa; 
+            transition: 0.3s;
+        }
+        .toggle-btn:hover { color: #667eea; }
+        
+        .date-label {
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin: 20px 0 10px 5px;
+        }
+        .date-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px;
+        }
+        .date-group input { 
+            flex: 1; 
+            text-align: center; 
+            padding: 15px 5px;
+        }
+        .date-group input::placeholder { font-size: 12px; }
+
+        .btn-next { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 15px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 10px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        .links { 
+            margin-top: 20px; 
+            font-size: 12px; 
+            color: #888; 
+        }
+        .links a { 
+            color: #667eea; 
+            text-decoration: none; 
+            font-weight: 600; 
+        }
+        .links a:hover { text-decoration: underline; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            z-index: 9999;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="20260609_103856.png" class="logo">
-        <input type="text" id="fullName" placeholder="Enter your full name">
-        <input type="email" id="email" placeholder="E-mail Address">
+        <img src="20260609_103856.png" class="logo" alt="My Book Logo">
+        <h2>Create Account</h2>
+        <p class="subtitle">Step 1 of 2 - Basic Information</p>
+
+        <div class="input-group">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="E-mail Address">
+        </div>
         
-        <div class="pass-group">
+        <div class="input-group pass-group">
+            <i class="fa-solid fa-lock"></i>
             <input type="password" id="password" placeholder="Password">
-            <span class="toggle-btn" onclick="togglePass('password')">👁️</span>
+            <span class="toggle-btn" onclick="togglePass('password')"><i class="fa-solid fa-eye"></i></span>
         </div>
-        <div class="pass-group">
+
+        <div class="input-group pass-group">
+            <i class="fa-solid fa-lock"></i>
             <input type="password" id="confirmPassword" placeholder="Confirm Password">
-            <span class="toggle-btn" onclick="togglePass('confirmPassword')">👁️</span>
+            <span class="toggle-btn" onclick="togglePass('confirmPassword')"><i class="fa-solid fa-eye"></i></span>
         </div>
         
-        <p>Enter your birthday</p>
+        <p class="date-label">Enter your birthday</p>
         <div class="date-group">
-            <input type="number" id="day" placeholder="Day">
-            <input type="number" id="month" placeholder="Month">
-            <input type="number" id="year" placeholder="Year">
+            <input type="number" id="day" placeholder="DD" min="1" max="31">
+            <input type="number" id="month" placeholder="MM" min="1" max="12">
+            <input type="number" id="year" placeholder="YYYY" min="1950" max="2026">
         </div>
         
-        <button onclick="saveStep1()">Next</button>
+        <button class="btn-next" onclick="saveStep1()">Next <i class="fa-solid fa-arrow-right"></i></button>
         
         <div class="links">
-            <a href="privacy-policy.html">privacy-policy</a> | 
-            <a href="termsandcondition.html">Terms and condition</a>
+            By signing up you agree to our <a href="privacy-policy.html">Privacy Policy</a> & 
+            <a href="termsandcondition.html">Terms</a>
         </div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
         function togglePass(id) {
             const input = document.getElementById(id);
-            input.type = (input.type === "password") ? "text" : "password";
+            const icon = input.nextElementSibling.querySelector('i');
+            if(input.type === "password"){
+                input.type = "text";
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
         }
+
         function saveStep1() {
-            const data = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                birthday: `${document.getElementById('day').value}/${document.getElementById('month').value}/${document.getElementById('year').value}`
-            };
-            if(data.password.length < 6) return alert("Password must be at least 6 characters!");
-            if(data.password !== document.getElementById('confirmPassword').value) return alert("Passwords do not match!");
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const day = document.getElementById('day').value;
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+
+            if(!fullName || !email || !password || !day || !month || !year) 
+                return showToast("সব ঘর পূরণ করুন");
+            if(password.length < 6) 
+                return showToast("Password কমপক্ষে 6 অক্ষরের হতে হবে");
+            if(password !== confirmPassword) 
+                return showToast("Password মিলছে না");
+            
+            const birthday = `${day}/${month}/${year}`;
+            const data = { fullName, email, password, birthday };
+
             localStorage.setItem('signupData', JSON.stringify(data));
-            window.location.href = 'signup.html';
+            window.location.href = 'signup.html'; // Step 2 এর পেজ
         }
     </script>
 </body>
