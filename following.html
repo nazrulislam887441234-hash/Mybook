@@ -56,8 +56,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, getDocs, getDoc, onSnapshot, query, limit, startAfter, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+import { getFirestore, collection, getDocs, getDoc, addDoc, serverTimestamp, onSnapshot, query, limit, startAfter, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const firebaseConfig = { apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" };
 const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth();
 
@@ -273,17 +272,37 @@ window.handleLike = async (postId, isDoubleTap = false) => {
     const postRef = doc(db, "posts", postId);
     const btn = document.getElementById(`likeBtn-${postId}`);
     const postSnap = await getDoc(postRef);
-    const likes = postSnap.data().likes || [];
+    const postData = postSnap.data();
+    const likes = postData.likes || [];
     let isLikedNow = likes.includes(currentUserId);
 
     if(!isLikedNow) {
         await updateDoc(postRef, { likes: arrayUnion(currentUserId) });
         isLikedNow = true;
         document.getElementById("likeSound").play();
+
+        // ✅ Like Notification
+        if (postData.uid !== currentUserId) {
+            const mySnap = await getDoc(doc(db, "users", currentUserId));
+            const myData = mySnap.data();
+            await addDoc(collection(db, "notifications"), {
+                to: postData.uid,
+                type: "like",
+                from: currentUserId,
+                fromName: myData.userName,
+                fromPhoto: myData.userPhoto,
+                text: "liked your post",
+                postId: postId,
+                read: false,
+                createdAt: serverTimestamp()
+            });
+        }
+
     } else if (!isDoubleTap) {
         await updateDoc(postRef, { likes: arrayRemove(currentUserId) });
         isLikedNow = false;
     }
+    
     btn.classList.toggle('liked', isLikedNow);
     btn.innerHTML = `<i class="${isLikedNow? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> Like`;
     const newCount = isLikedNow? likes.length + 1 : likes.length - 1;
@@ -293,28 +312,40 @@ window.handleLike = async (postId, isDoubleTap = false) => {
 window.followUser = async (uid) => {
     const btn = document.getElementById(`followBtn-${uid}`);
     const isFollowing = followingList.includes(uid);
+    
     if(isFollowing){
+        // Unfollow
         await updateDoc(doc(db, "users", currentUserId), { following: arrayRemove(uid) });
         await updateDoc(doc(db, "users", uid), { followers: arrayRemove(currentUserId) });
-        btn.innerText = "Follow"; btn.style.background = "#007bff";
-        followingList = followingList.filter(id => id!== uid);
+        
+        btn.innerText = "Follow"; 
+        btn.style.background = "#007bff";
+        followingList = followingList.filter(id => id !== uid);
+        
     } else {
+        // Follow
         await updateDoc(doc(db, "users", currentUserId), { following: arrayUnion(uid) });
         await updateDoc(doc(db, "users", uid), { followers: arrayUnion(currentUserId) });
-        btn.innerText = "Following"; btn.style.background = "#ccc";
+
+        // ✅ Follow Notification
+        const mySnap = await getDoc(doc(db, "users", currentUserId));
+        const myData = mySnap.data();
+        await addDoc(collection(db, "notifications"), {
+            to: uid,
+            type: "follow",
+            from: currentUserId,
+            fromName: myData.userName,
+            fromPhoto: myData.userPhoto,
+            text: "started following you",
+            read: false,
+            createdAt: serverTimestamp()
+        });
+
+        btn.innerText = "Following"; 
+        btn.style.background = "#ccc";
         followingList.push(uid);
     }
 };
-
-window.addEventListener('scroll', () => {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-        if(displayedCount < allPostsBuffer.length){
-            renderPosts();
-        } else {
-            loadFeed(false);
-        }
-    }
-});
 </script>
 </body>
 </html>
