@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Notifications - My Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #0052ff; --bg: #0a0e1a; } /* 1 Color Theme */
+        
+        body { font-family: 'Hind Siliguri', sans-serif; background: var(--bg); margin: 0; padding-bottom: calc(90px + env(safe-area-inset-bottom)); color: white; }
+
+    .bg-gradient { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 20%, rgba(0,82,255,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,82,255,0.1) 0%, transparent 50%); z-index: -1; }
+
+   .container { width: 100%; max-width: 540px; margin: 0 auto; min-height: 100vh; }
+
+   .header {
+        padding: 20px; display: flex; align-items: center; justify-content: space-between;
+        background: rgba(10,14,26,0.7); backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        border-bottom: 1px solid rgba(0,82,255,0.2); 
+        position: sticky; top: 0; z-index: 10;
+        padding-top: calc(20px + env(safe-area-inset-top));
+     }
+   .header-left { display:flex; align-items:center; gap:15px; }
+   .header i { font-size: 22px; cursor: pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:rgba(0,82,255,0.15); border-radius:50%; }
+   .header h3 { margin: 0; font-size: 22px; font-weight: 700; background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+   .read-all { font-size: 14px; color: var(--primary); cursor: pointer; font-weight: 700; padding:8px 12px; background:rgba(0,82,255,0.15); border-radius:12px; }
+
+   .noti-list { padding: 15px; }
+   
+   /* Swipe to Delete Wrapper */
+   .noti-wrapper { position: relative; margin-bottom: 12px; border-radius: 20px; overflow: hidden; }
+   .delete-bg { position: absolute; right: 0; top: 0; height: 100%; width: 80px; background: #ff3b30; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+   
+   .noti-item {
+        position: relative; z-index: 2;
+        display: flex; gap: 14px; padding: 16px;
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(20px);
+        border-radius: 20px; 
+        cursor: pointer; transition: 0.3s cubic-bezier(.4,0,.2,1);
+        border: 1px solid rgba(255,255,255,0.08);
+     }
+   .noti-item:active { transform: scale(0.97); }
+   .noti-item.unread { background: rgba(0,82,255,0.1); border: 1px solid rgba(0,82,255,0.3); }
+   .noti-item.unread::before { content:''; position:absolute; left:0; top:0; width:3px; height:100%; background:var(--primary); border-radius: 20px 0 0 20px; }
+   
+   .noti-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid rgba(0,82,255,0.3); }
+   .noti-body { flex: 1; }
+   .noti-text { font-size: 15px; margin: 0; line-height: 1.5; font-weight: 500; }
+   .noti-text b { color: var(--primary); font-weight: 700; }
+   .noti-time { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 5px; display:flex; align-items:center; gap:5px; }
+   .empty { text-align: center; color: rgba(255,255,255,0.5); padding: 80px 20px; font-size: 16px; }
+   .noti-icon { font-size: 22px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #0040c1); }
+
+   .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10,14,26,0.7); backdrop-filter: blur(30px) saturate(180%); border-top: 1px solid rgba(0,82,255,0.2); display: flex; justify-content: space-around; align-items: center; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)); z-index: 100; }
+   .nav-item { flex: 1; text-align: center; color: rgba(255,255,255,0.5); font-size: 24px; cursor: pointer; transition: 0.2s; }
+   .nav-item:active { transform: scale(0.9); }
+   .nav-item.active { color: var(--primary); }
+   .nav-item span { font-size: 10px; font-weight: 600; display:block; margin-top:4px; }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <i class="fa-arrow-left" onclick="history.back()"></i>
+                <h3>Notifications</h3>
+            </div>
+            <div class="read-all" onclick="markAllRead()">Read All</div>
+        </div>
+        <div class="noti-list" id="notiList">
+            <p class="empty"><i class="fa-regular fa-bell-slash" style="font-size:40px; margin-bottom:10px; display:block;"></i>No notifications yet</p>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+           <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+     <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
+   </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const app = initializeApp({ apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97" });
+    const db = getFirestore(app); const auth = getAuth(app);
+    const notiList = document.getElementById('notiList');
+    const DEFAULT_AVATAR = "https://i.ibb.co/5x3yZ7N/default.png";
+    let currentUserId = "";
+
+    function timeAgo(timestamp) {
+        const seconds = Math.floor((Date.now() - timestamp) / 1000);
+        if (seconds < 60) return `now`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h`;
+        return `${Math.floor(hours / 24)}d`;
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if(!user) window.location.href = 'index.html';
+        else {
+            currentUserId = user.uid;
+            loadNotifications();
+        }
+    });
+
+    function loadNotifications() {
+        const q = query(collection(db, "notifications"), where("to", "==", currentUserId), orderBy("createdAt", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
+            if(snapshot.empty) {
+                notiList.innerHTML = `<p class="empty"><i class="fa-regular fa-bell-slash" style="font-size:40px; margin-bottom:10px; display:block;"></i>No notifications yet</p>`;
+                return;
+            }
+            
+            let html = "";
+            snapshot.forEach(docSnap => {
+                const n = docSnap.data();
+                const time = n.createdAt?.toMillis() || Date.now();
+                const avatar = n.fromPhoto || DEFAULT_AVATAR;
+                
+            let iconHtml = `<img src="${avatar}" class="noti-avatar" onerror="this.src='${DEFAULT_AVATAR}'">`;
+
+if(n.type === 'like') {
+    iconHtml = `<div class="noti-icon"><i class="fa-solid fa-thumbs-up"></i></div>`;
+}
+
+if(n.type === 'comment') {
+    iconHtml = `<div class="noti-icon"><i class="fa-solid fa-comment"></i></div>`;
+}
+
+if(n.type === 'reply') {
+    iconHtml = `<div class="noti-icon"><i class="fa-solid fa-reply"></i></div>`;
+}
+
+if(n.type === 'follow') {
+    iconHtml = `<div class="noti-icon"><i class="fa-solid fa-user-plus"></i></div>`;
+}
+
+if(n.type === 'new_post') {
+    iconHtml = `<div class="noti-icon"><i class="fa-solid fa-video"></i></div>`;
+}
+                html += `
+                <div class="noti-wrapper" id="noti-${docSnap.id}">
+                    <div class="delete-bg" onclick="deleteNotification('${docSnap.id}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </div>
+                    <div class="noti-item ${n.read ? '' : 'unread'}" onclick="openNotification('${docSnap.id}', '${n.type}', '${n.postId}', '${n.from}')">
+                        ${iconHtml}
+                        <div class="noti-body">
+                            <p class="noti-text"><b>${n.fromName || 'User'}</b> ${n.text}</p>
+                            <div class="noti-time"><i class="fa-regular fa-clock"></i> ${timeAgo(time)}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            notiList.innerHTML = html;
+        });
+    }
+
+    // Notification Delete
+    window.deleteNotification = async (notiId) => {
+        if(confirm("Delete this notification?")) {
+            await deleteDoc(doc(db, "notifications", notiId));
+        }
+    }
+
+    // Notification এ Click করলে
+    window.openNotification = async (notiId, type, postId, fromUid) => {
+        await updateDoc(doc(db, "notifications", notiId), { read: true });
+        
+        if(type === 'comment' || type === 'reply' || type === 'like') {
+    window.location.href = `comments.html?id=${postId}`;
+}
+else if(type === 'new_post') {
+    window.location.href = `following.html`;
+}
+else if(type === 'follow') {
+    window.location.href = `user-profile.html?uid=${fromUid}`;
+}
+};
+    // সব Read করে দাও
+    window.markAllRead = async () => {
+        const q = query(collection(db, "notifications"), where("to", "==", currentUserId), where("read", "==", false));
+        const snap = await getDocs(q);
+        snap.forEach(d => updateDoc(doc(db, "notifications", d.id), { read: true }));
+    }
+    </script>
+</body>
+</html>
