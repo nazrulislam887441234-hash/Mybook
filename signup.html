@@ -3,41 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Signup</title>
+    <title>My Book - Complete Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f9f9f9; padding: 20px; margin: 0; }
-    .container { width: 100%; max-width: 350px; background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .logo { width: 120px; margin-bottom: 10px; }
-    .photo-box { width: 120px; height: 120px; border-radius: 50%; background: #eee; margin: 10px auto; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; font-size: 12px; color: #777; }
-        #coverPhoto { width: 100%; height: 100px; border: 2px dashed #ccc; margin: 10px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; font-size: 12px; color: #777; background: #f5f5f5; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+       .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 35px 30px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.6s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+       .logo { width: 80px; height: 80px; margin-bottom: 10px; border-radius: 20px; object-fit: contain; }
+        h2 { font-size: 24px; font-weight: 900; color: #333; margin-bottom: 5px; }
+       .subtitle { color: #888; font-size: 13px; margin-bottom: 25px; }
 
-       .size-note { font-size: 12px; color: #007bff; font-weight: bold; margin-top: -5px; margin-bottom: 10px; }
+        /* UPLOAD BOXES */
+       .upload-label { font-size: 13px; font-weight: 600; color: #555; text-align: left; margin: 15px 0 8px 5px; }
+       .photo-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            margin: 0 auto 15px;
+            border: 3px dashed #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transition: 0.3s;
+        }
+       .photo-box:hover { transform: scale(1.05); border-color: #764ba2; }
+       .photo-box i { font-size: 30px; color: #667eea; }
 
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-top: 10px; font-size: 14px; }
-        button { width: 100%; padding: 15px; background: #00ff44; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; color: white; font-size: 16px; margin-top: 15px; }
-        button:disabled { background: #888; }
-    .preview { width: 100%; height: 100%; object-fit: cover; }
+        #coverPhoto {
+            width: 100%;
+            height: 100px;
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            background: #f5f5f5;
+            transition: 0.3s;
+        }
+        #coverPhoto:hover { border-color: #764ba2; background: #fff; }
+        #coverPhoto i { font-size: 24px; color: #667eea; margin-right: 8px; }
 
-    .loading-text { font-size: 12px; color: #28a745; margin-top: 5px; }
+       .size-note { font-size: 11px; color: #667eea; font-weight: 600; margin-bottom: 15px; }
+
+       .preview { width: 100%; height: 100%; object-fit: cover; }
+       .loading-text { font-size: 12px; color: #28a745; margin-bottom: 15px; font-weight: 600; }
+
+        /* INPUT */
+       .input-group { position: relative; margin-bottom: 15px; }
+       .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 16px;
+        }
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border-radius: 15px;
+            border: 2px solid #eee;
+            font-size: 15px;
+            background: #f9f9f9;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #667eea; background: white; }
+
+        /* BUTTON */
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 255, 136, 0.4); }
+        button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        /* TOAST */
+       .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            z-index: 9999;
+            opacity: 0;
+            transition: 0.3s;
+        }
+       .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="20260609_103856.png" class="logo">
-        <input type="file" id="profileInput" hidden accept="image/*">
-        <div class="photo-box" onclick="document.getElementById('profileInput').click()">Profile Photo</div>
+        <img src="20260609_103856.png" class="logo" alt="My Book Logo">
+        <h2>Complete Profile</h2>
+        <p class="subtitle">Step 2 of 2 - Last Step</p>
 
+        <p class="upload-label">Profile Photo</p>
+        <input type="file" id="profileInput" hidden accept="image/*">
+        <div class="photo-box" onclick="document.getElementById('profileInput').click()">
+            <i class="fa-solid fa-camera"></i>
+        </div>
+
+        <p class="upload-label">Cover Photo</p>
+        <p class="size-note">Recommended: 320×100px for best quality</p>
         <input type="file" id="coverInput" hidden accept="image/*">
-        <div class="size-note">ব্যানার কারেক্ট সাইজ ৩২০×১০০</div>
-        <div id="coverPhoto" onclick="document.getElementById('coverInput').click()">Cover Photo</div>
+        <div id="coverPhoto" onclick="document.getElementById('coverInput').click()">
+            <i class="fa-solid fa-image"></i> Upload Cover
+        </div>
         <div id="coverStatus" class="loading-text"></div>
 
-        <!-- বিকাশ নাম্বার ফিল্ড -->
-        <input type="tel" id="bkashNumber" placeholder="টাকা পাওয়ার জন্য বিকাশ নাম্বার দিন" required>
+        <div class="input-group">
+            <i class="fa-solid fa-wallet"></i>
+            <input type="tel" id="bkashNumber" placeholder="টাকা পাওয়ার জন্য বিকাশ নাম্বার দিন" required>
+        </div>
 
-        <button id="finishBtn" onclick="finishSignup()">Finish & Monetize On</button>
+        <button id="finishBtn" onclick="finishSignup()">
+            <i class="fa-solid fa-rocket"></i> Finish & Monetize On
+        </button>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -58,14 +188,23 @@
         const db = getFirestore(app);
         const IMGBB_KEY = "fd8494417e28e4de2384f71202e82d27";
 
-        let processedCoverFile = null; // কমপ্রেস করা ফাইল এখানে থাকবে
+        let processedCoverFile = null;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
 
         // Profile Photo Preview
         document.getElementById('profileInput').onchange = (e) => {
             const file = e.target.files[0];
             if(!file) return;
             const reader = new FileReader();
-            reader.onload = (ev) => { document.querySelector('.photo-box').innerHTML = `<img src="${ev.target.result}" class="preview">`; };
+            reader.onload = (ev) => {
+                document.querySelector('.photo-box').innerHTML = `<img src="${ev.target.result}" class="preview">`;
+            };
             reader.readAsDataURL(file);
         };
 
@@ -73,69 +212,47 @@
         document.getElementById('coverInput').onchange = async (e) => {
             const file = e.target.files[0];
             if(!file) return;
-
-            document.getElementById('coverStatus').innerText = "Processing...";
-
+            document.getElementById('coverStatus').innerText = "Processing image...";
             processedCoverFile = await processCoverImage(file);
-
-            // Preview দেখানো
             const reader = new FileReader();
             reader.onload = (ev) => {
                 document.getElementById('coverPhoto').innerHTML = `<img src="${ev.target.result}" class="preview">`;
-                document.getElementById('coverStatus').innerText = "Ready - 320x100 WEBP";
+                document.getElementById('coverStatus').innerText = "✓ Ready - 320x100 WEBP";
             };
             reader.readAsDataURL(processedCoverFile);
         };
 
-        // Image Processing Function
         async function processCoverImage(file) {
             return new Promise((resolve) => {
                 const img = new Image();
                 const reader = new FileReader();
-
-                reader.onload = (e) => {
-                    img.src = e.target.result;
-                };
-
+                reader.onload = (e) => { img.src = e.target.result; };
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     const targetW = 320;
                     const targetH = 100;
-
                     canvas.width = targetW;
                     canvas.height = targetH;
 
-                    // যদি ছবি 320x100 হয় তাহলে শুধু compress করবো, crop করবো না
-                    if(img.width === targetW && img.height === targetH) {
-                        ctx.drawImage(img, 0, 0, targetW, targetH);
+                    const imgRatio = img.width / img.height;
+                    const targetRatio = targetW / targetH;
+                    let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
+
+                    if(imgRatio > targetRatio) {
+                        sWidth = img.height * targetRatio;
+                        sx = (img.width - sWidth) / 2;
                     } else {
-                        // Cover crop logic - center crop
-                        const imgRatio = img.width / img.height;
-                        const targetRatio = targetW / targetH;
-
-                        let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
-
-                        if(imgRatio > targetRatio) {
-                            // ছবি বেশি চওড়া - পাশ থেকে কাটবো
-                            sWidth = img.height * targetRatio;
-                            sx = (img.width - sWidth) / 2;
-                        } else {
-                            // ছবি বেশি লম্বা - উপর নিচ থেকে কাটবো
-                            sHeight = img.width / targetRatio;
-                            sy = (img.height - sHeight) / 2;
-                        }
-
-                        ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetW, targetH);
+                        sHeight = img.width / targetRatio;
+                        sy = (img.height - sHeight) / 2;
                     }
 
-                    // WEBP তে convert with 80% quality
+                    ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetW, targetH);
                     canvas.toBlob((blob) => {
                         const webpFile = new File([blob], "cover.webp", { type: "image/webp" });
                         resolve(webpFile);
                     }, 'image/webp', 0.8);
                 };
-
                 reader.readAsDataURL(file);
             });
         }
@@ -143,18 +260,18 @@
         window.finishSignup = async () => {
             const btn = document.getElementById('finishBtn');
             const pFile = document.getElementById('profileInput').files[0];
-            const cFile = processedCoverFile; // কমপ্রেস করা ফাইল
+            const cFile = processedCoverFile;
             const bkash = document.getElementById('bkashNumber').value.trim();
 
-            if(!pFile ||!cFile) return alert("Please select both photos!");
-            if(!bkash ||!/^01[0-9]{9}$/.test(bkash)) return alert("Valid বিকাশ নাম্বার দিন 01XXXXXXXXX");
+            if(!pFile ||!cFile) return showToast("Please select both photos!");
+            if(!bkash ||!/^01[0-9]{9}$/.test(bkash)) return showToast("Valid বিকাশ নাম্বার দিন 01XXXXXXXXX");
 
             const signupData = JSON.parse(localStorage.getItem('signupData'));
             if(!signupData ||!signupData.email ||!signupData.password) {
-                return alert("Signup data missing! Please go back to step 1.");
+                return showToast("Signup data missing! Go back to step 1.");
             }
 
-            btn.innerText = "Please wait...";
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
             btn.disabled = true;
 
             try {
@@ -173,22 +290,24 @@
                     userName: signupData.fullName,
                     email: signupData.email,
                     userPhoto: pUrl,
-                    coverPhoto: cUrl, // ✅ এটা এখন 320x100 webp
+                    coverPhoto: cUrl,
                     bkashNumber: bkash,
                     uid: cred.user.uid,
                     isMonetized: true,
                     followers: [],
                     following: [],
+                    birthday: signupData.birthday,
                     createdAt: serverTimestamp()
                 });
 
                 localStorage.removeItem('signupData');
-                alert("Signup + Monetize Completed! Login now!");
-                window.location.href = 'index.html';
+                showToast("Signup + Monetize Completed!");
+                setTimeout(() => window.location.href = 'index.html', 1500);
+
             } catch (err) {
                 console.error(err);
-                alert("Error: " + err.message);
-                btn.innerText = "Finish & Monetize On";
+                showToast("Error: " + err.message);
+                btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Finish & Monetize On';
                 btn.disabled = false;
             }
         };
