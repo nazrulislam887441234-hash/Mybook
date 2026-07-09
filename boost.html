@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boost Post - My Book Pro</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+* { box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; }
+body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding-bottom: 80px; min-height: 100vh; }
+
+header { 
+    background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); 
+    padding: 20px; text-align: center; font-size: 22px; font-weight: 700; 
+    color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
+}
+
+.container { max-width: 850px; margin: 25px auto; padding: 0 15px; }
+
+.price-box {
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(15px);
+    padding: 25px; border-radius: 25px; text-align: center; color: white; margin-bottom: 25px;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+.price-box .price { font-size: 40px; font-weight: 700; background: linear-gradient(45deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.price-box .note { font-size: 14px; opacity: 0.9; margin-top: 8px; line-height: 1.6; }
+
+.benefits { 
+    background: rgba(255,255,255,0.95); color: #333;
+    padding: 20px; border-radius: 20px; margin-bottom: 25px; font-size: 14px; 
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1); line-height: 1.8;
+}
+
+.post-card { 
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+    border-radius: 20px; padding: 20px; margin-bottom: 20px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1); transition: all 0.3s;
+}
+.post-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.15); }
+.post-card img { width: 100%; border-radius: 15px; margin: 12px 0; }
+.post-stats { display: flex; gap: 20px; font-size: 13px; color: #666; margin-bottom: 12px; }
+
+.boost-btn { 
+    background: linear-gradient(45deg, #ff5722, #ff9800); color: white; border: none; 
+    padding: 14px 15px; border-radius: 15px; font-weight: 700; width: 100%; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255,87,34,0.4); transition: all 0.3s; font-size: 15px;
+}
+.boost-btn:hover { transform: scale(1.03); }
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; overflow-y: auto; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from {opacity:0} to {opacity:1} }
+.modal-content { 
+    background: white; margin: 30px auto; padding: 30px; border-radius: 25px; max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-content h3 { text-align: center; color: #ff5722; margin-bottom: 20px; font-size: 20px; }
+
+.form-group { margin-bottom: 18px; }
+.form-group label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 8px; color: #444; }
+.form-group input, .form-group select, .form-group textarea { 
+    width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 12px; outline: none;
+    transition: border 0.3s; font-size: 15px;
+}
+.form-group input:focus, .form-group select:focus { border-color: #667eea; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.estimate-box { background: #fff3cd; padding: 15px; border-radius: 12px; text-align: center; font-weight: 700; color: #856404; border: 1px solid #ffeeba; line-height: 1.6; }
+
+.send-btn { 
+    background: linear-gradient(45deg, #28a745, #20c997); color: white; border: none; 
+    padding: 16px; width: 100%; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 17px;
+    box-shadow: 0 6px 20px rgba(40,167,69,0.4); transition: all 0.3s;
+}
+.send-btn:hover { transform: scale(1.02); }
+.close-btn { float: right; font-size: 30px; cursor: pointer; color: #999; }
+.success-msg { display: none; background: linear-gradient(45deg, #28a745, #20c997); color: white; padding: 20px; border-radius: 15px; margin: 15px 0; text-align: center; }
+</style>
+</head>
+<body>
+
+<header>🚀 Pro Boost Center</header>
+
+<div class="container">
+    <div class="price-box">
+        <div class="price">৳300 / দিন</div>
+        <div class="note">প্রতিদিন ফিক্সড ৩০০ টাকা।<br>টোটাল ভিউ ডিপেন্ড করবে ইউজারদের উপর।<br>প্রতি দিন ১০০০ থেকে ১০,০০০+ পর্যন্ত হতে পারে।</div>
+    </div>
+
+    <div class="benefits">
+        <b><i class="fa-solid fa-star" style="color:#FFD700"></i> Pro Boost এর সুবিধা</b><br>
+        1. সকল Monetized পোস্টের নিচে আপনার Ad দেখাবে<br>
+        2. Location, Age, Gender Target করতে পারবেন<br>
+        3. 12-24 ঘন্টার মধ্যে WhatsApp এ Active করে দেওয়া হবে<br>
+        4. ভিউ এর কোনো গ্যারান্টি নেই, এটা অর্গানিক রিচ এর উপর নির্ভরশীল
+    </div>
+
+    <div id="myPostsList"><p style="text-align:center; color:white;">Loading your posts...</p></div>
+    <div id="successBox" class="success-msg"><i class="fa-solid fa-circle-check"></i> <b>রিকোয়েস্ট পাঠানো হয়েছে!</b><br>১২-২৪ ঘন্টার মধ্যে যোগাযোগ করা হবে।</div>
+</div>
+
+<div id="boostModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3><i class="fa-solid fa-rocket"></i> Boost Campaign</h3>
+    <img id="boostImg" style="width:100%; border-radius:15px; margin-bottom:15px;">
+    
+    <div class="form-group">
+        <label>Marketing Objective</label>
+        <select id="boostObjective">
+            <option value="traffic">Website Clicks</option>
+            <option value="video">Video Views</option>
+            <option value="whatsapp">WhatsApp Messages</option>
+            <option value="page">Page Likes</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Destination Link / Video URL *</label>
+        <input type="url" id="boostLink" placeholder="https://yourwebsite.com" required>
+    </div>
+
+    <div class="form-group">
+        <label>Ad Caption</label>
+        <textarea id="boostCaption" rows="2" placeholder="Ad এর নিচে কি লেখা থাকবে"></textarea>
+    </div>
+
+    <div class="grid-2">
+        <div class="form-group">
+            <label>কত দিন চালাবেন?</label>
+            <input type="number" id="boostDays" placeholder="7" value="7" onkeyup="calcTotal()">
+        </div>
+        <div class="form-group">
+            <label>টোটাল বিল ৳</label>
+            <input type="text" id="totalBill" readonly value="৳2100">
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="form-group">
+            <label>Location</label>
+            <select id="boostLocation">
+                <option value="all">All Bangladesh</option>
+                <option value="Dhaka Division">Dhaka Division</option>
+                <option value="Chattogram Division">Chattogram Division</option>
+                <option value="Rajshahi Division">Rajshahi Division</option>
+                <option value="Khulna Division">Khulna Division</option>
+                <option value="Barishal Division">Barishal Division</option>
+                <option value="Sylhet Division">Sylhet Division</option>
+                <option value="Rangpur Division">Rangpur Division</option>
+                <option value="Mymensingh Division">Mymensingh Division</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Gender</label>
+            <select id="boostGender">
+                <option value="all">All</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Age Range</label>
+        <input type="text" id="boostAge" placeholder="18-35" value="18-45">
+    </div>
+
+    <div class="form-group">
+        <label>Ad Placement</label>
+        <select id="boostPlacement">
+            <option value="feed">For You + Following + Home Feed</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Payment Method</label>
+        <select id="paymentMethod">
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+            <option value="bank">Bank Transfer</option>
+        </select>
+    </div>
+
+    <div class="estimate-box">
+        <i class="fa-solid fa-info-circle"></i> টোটাল ভিউ কত হবে তা সঠিক বলা সম্ভব না।<br>
+        এটা নির্ভর করবে ইউজারদের Engagement এর উপর।
+    </div>
+
+    <div class="form-group">
+        <label>WhatsApp নাম্বার *</label>
+        <input type="tel" id="boostWhatsapp" placeholder="01XXXXXXXXX" required>
+    </div>
+
+    <button class="send-btn" onclick="sendBoostRequest()">🚀 Send Boost Request</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = { apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth();
+
+let currentUserId = ""; let selectedPost = {};
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) window.location.href = 'index.html';
+    else { currentUserId = user.uid; loadMyPosts(); }
+});
+
+async function loadMyPosts(){
+    const q = query(collection(db, "posts"), where("uid", "==", currentUserId));
+    const snap = await getDocs(q);
+    let html = "";
+    if(snap.empty) html = "<p style='color:white; text-align:center;'>আপনার কোনো পোস্ট নেই</p>";
+    snap.forEach(doc => {
+        const p = doc.data();
+        html += `
+        <div class="post-card">
+            <b>${p.caption}</b>
+            <div class="post-stats">
+                <span><i class="fa-eye"></i> ${p.views?.length || 0} Organic Views</span>
+                <span><i class="fa-heart"></i> ${p.likes?.length || 0}</span>
+            </div>
+            <img src="${p.imageUrl}">
+            <button class="boost-btn" onclick='openModal("${doc.id}", "${p.imageUrl}", "${p.caption}")'>
+                <i class="fa-solid fa-rocket"></i> Boost This Post
+            </button>
+        </div>`;
+    });
+    document.getElementById('myPostsList').innerHTML = html;
+}
+
+window.openModal = function(postId, imgUrl, caption){
+    selectedPost = {postId, imgUrl, caption};
+    document.getElementById('boostImg').src = imgUrl;
+    document.getElementById('boostCaption').value = caption;
+    calcTotal();
+    document.getElementById('boostModal').style.display = 'block';
+}
+
+window.closeModal = function(){
+    document.getElementById('boostModal').style.display = 'none';
+}
+
+window.calcTotal = function(){
+    const days = document.getElementById('boostDays').value || 7;
+    const total = days * 300;
+    document.getElementById('totalBill').value = `৳${total}`;
+}
+
+window.sendBoostRequest = async function(){
+    const data = {
+        objective: document.getElementById('boostObjective').value,
+        link: document.getElementById('boostLink').value,
+        caption: document.getElementById('boostCaption').value,
+        days: document.getElementById('boostDays').value,
+        totalBill: document.getElementById('totalBill').value,
+        location: document.getElementById('boostLocation').value,
+        gender: document.getElementById('boostGender').value,
+        age: document.getElementById('boostAge').value,
+        placement: document.getElementById('boostPlacement').value,
+        payment: document.getElementById('paymentMethod').value,
+        whatsapp: document.getElementById('boostWhatsapp').value,
+    };
+
+    if(!data.link || !data.days || !data.whatsapp){ alert("সব ঘর পূরণ করুন"); return; }
+
+    await addDoc(collection(db, "boostRequests"), {
+        uid: currentUserId, ...selectedPost, ...data, 
+        pricePerDay: 300, status: "pending", createdAt: serverTimestamp()
+    });
+
+    closeModal();
+    document.getElementById('successBox').style.display = 'block';
+    setTimeout(() => { document.getElementById('successBox').style.display = 'none'; }, 5000);
+}
+</script>
+</body>
+</html>
