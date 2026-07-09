@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - My Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding-bottom: 80px; min-height: 100vh; }
+    .profile-header { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); padding-bottom: 20px; text-align: center; margin-bottom: 15px; border-radius: 0 0 25px 25px; position: relative; }
+    .banner-wrap { width: 100%; height: 140px; overflow: hidden; background: #000; }
+    .banner { width: 100%; height: 140px; object-fit: cover; background: #ddd; }
+    .avatar-wrap { position: relative; margin-top: -50px; z-index: 2; }
+    .avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; object-fit: cover; box-shadow: 0 5px 20px rgba(0,0,0,0.2); background: white; }
+    .profile-info { color: white; padding: 0 15px; margin-top: 10px; position: relative; z-index: 2; }
+    .profile-info h2 { margin: 10px 0 5px; font-size: 22px; }
+    .profile-info p { margin: 5px 0; opacity: 0.9; font-size: 14px; }
+    .stats-row { display: flex; justify-content: center; gap: 25px; margin: 15px 0; font-weight: 600; }
+    .follow-btn { padding: 10px 40px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; transition: all 0.3s; }
+    .follow-btn:hover { transform: scale(1.05); }
+    .feed-container { max-width: 700px; margin: 0 auto; padding: 0 10px; }
+    .post-card { background: white; margin-bottom: 15px; padding: 15px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+    .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .post-img { width: 100%; border-radius: 15px; margin-top: 10px; }
+    .creator-ad { margin: 10px 0; padding: 12px; background: #fff8e1; border-radius: 15px; border: 1px solid #ffe082; min-height:100px; }
+    .ad-label { font-size: 12px; color: #777; margin-bottom: 8px; text-align:center; width:100%; font-weight:bold; }
+    .stats-bar { display:flex; justify-content: space-between; padding: 8px 5px; font-size:14px; color:#555; border-bottom: 1px solid #eee; }
+    .action-bar { display:flex; justify-content: space-around; padding: 5px 0; }
+    .action-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; border:none; background:none; cursor:pointer; padding:8px; border-radius:8px; font-size:15px; font-weight:600; color:#555; }
+    .action-btn:hover { background: #f0f2f5; }
+    .action-btn.liked { color: #1877f2; }
+    .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); z-index: 1000; }
+    .nav-btn { font-size: 22px; cursor: pointer; color: #555; }
+    .full-loader { position: fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999; color:white; }
+    .loader { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.3); border-top: 5px solid white; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+     .end-msg { text-align:center; color:white; padding:20px; opacity:0.8; }
+    </style>
+</head>
+<body>
+<audio id="likeSound"><source src="like.mp3" type="audio/mpeg"></audio>
+<div class="full-loader" id="fullLoader"><div class="loader"></div><p style="margin-top:15px; font-weight:bold;">Loading Profile...</p></div>
+
+<div class="profile-header">
+    <div class="banner-wrap"><img id="banner" class="banner" src=""></div>
+    <div class="avatar-wrap"><img id="avatar" class="avatar" src=""></div>
+    <div class="profile-info">
+        <h2 id="name">Loading...</h2><p id="email"></p>
+        <div class="stats-row">
+            <span><b><span id="followersCount">0</span></b> Followers</span>
+            <span><b><span id="followingCount">0</span></b> Following</span>
+        </div>
+        <button id="followBtn" class="follow-btn" onclick="toggleFollow()"></button>
+    </div>
+</div>
+
+<div class="feed-container" id="postsList"></div><div id="endMessage"></div>
+<div class="nav-bar">
+     <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+     <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, query, where, orderBy, limit, startAfter, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({ apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" }));
+    const auth = getAuth();
+    const targetUid = new URLSearchParams(window.location.search).get('uid');
+    let lastVisible = null; let currentUser = null; let adsData = []; let viewedPosts = new Set(); let isLoading = false; let hasMore = true;
+
+    onAuthStateChanged(auth, async (user) => {
+        try {
+            if (!user) { window.location.href = 'index.html'; return; }
+            if (!targetUid) { window.location.href = 'home.html'; return; }
+            currentUser = user;
+            await loadAds(); await loadProfile(); await loadPosts();
+        } catch(err) { console.log("Error:", err); }
+        finally { document.getElementById('fullLoader').style.display = 'none'; }
+    });
+
+    async function loadAds(){ const adsSnap = await getDocs(collection(db, "ads")); adsData = []; adsSnap.forEach(doc => adsData.push({id: doc.id,...doc.data()})); }
+
+    async function loadProfile() {
+        const userSnap = await getDoc(doc(db, "users", targetUid));
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            document.getElementById('name').innerText = data.name || "Unknown User";
+            document.getElementById('email').innerText = data.email || "";
+            document.getElementById('avatar').src = data.profile || "https://i.ibb.co/QvVQh4y/default-avatar.png";
+            document.getElementById('banner').src = data.cover || 'https://via.placeholder.com/400x140/667eea/ffffff?text=Cover';
+            const followers = data.followers || []; const following = data.following || [];
+            document.getElementById('followersCount').innerText = followers.length;
+            document.getElementById('followingCount').innerText = following.length;
+            const btn = document.getElementById('followBtn'); const isFollowing = followers.includes(currentUser.uid);
+            btn.innerText = isFollowing? "Following" : "Follow";
+            btn.style.background = isFollowing? "#e4e6eb" : "#007bff"; btn.style.color = isFollowing? "black" : "white";
+        }
+    }
+
+    window.toggleFollow = async () => {
+        const btn = document.getElementById('followBtn'); const isFollowing = btn.innerText === "Following";
+        if (isFollowing) { await updateDoc(doc(db, "users", currentUser.uid), { following: arrayRemove(targetUid) }); await updateDoc(doc(db, "users", targetUid), { followers: arrayRemove(currentUser.uid) }); }
+        else { await updateDoc(doc(db, "users", currentUser.uid), { following: arrayUnion(targetUid) }); await updateDoc(doc(db, "users", targetUid), { followers: arrayUnion(currentUser.uid) }); }
+        await loadProfile();
+    };
+
+    window.loadPosts = async function() {
+        if(isLoading ||!hasMore) return; isLoading = true;
+        try {
+            // FIX: orderBy বাদ দিলাম। Index না থাকলে error দেয়
+            let q = query(collection(db, "posts"), where("uid", "==", targetUid), limit(10));
+            if (lastVisible) q = query(collection(db, "posts"), where("uid", "==", targetUid), startAfter(lastVisible), limit(10));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                hasMore = false;
+                if(!lastVisible) document.getElementById('postsList').innerHTML = "<p style='text-align:center; color:white; padding:40px;'>কোন পোস্ট নেই</p>";
+                else document.getElementById('endMessage').innerHTML = "<p class='end-msg'>আর কোনো পোস্ট নেই</p>";
+                isLoading = false; return;
+            }
+
+            // Client side এ Sort করবো নতুন থেকে পুরাতন
+            const posts = snap.docs.map(d => ({id: d.id,...d.data()})).sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            lastVisible = snap.docs[snap.docs.length - 1];
+
+            let htmlToAdd = '';
+            posts.forEach((p) => {
+                const postId = p.id; const isLiked = (p.likes || []).includes(currentUser.uid);
+                const likeCount = p.likes?.length || 0; const viewCount = p.views?.length || 0; const commentCount = p.commentsCount || 0;
+                let monetizeAdHtml = ''; if(p.isMonetized && adsData.length > 0){ monetizeAdHtml = `<div class="creator-ad"><div class="ad-label"><i class="fa-solid fa-circle-check" style="color:green"></i> Sponsored</div><div id="creator-ad-${postId}"></div></div>`; }
+                htmlToAdd += `<div class="post-card" id="post-${postId}" data-postid="${postId}"><div class="post-header"><div style="display:flex;align-items:center;gap:10px;"><img src="${p.userPhoto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"><b>${p.userName}</b></div></div><p>${p.caption}</p><img src="${p.imageUrl}" class="post-img" ondblclick="handleLike('${postId}', true)">${monetizeAdHtml}<div class="stats-bar"><span id="likeCount-${postId}"><i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${likeCount}</span><span id="viewCount-${postId}">${commentCount} Comments • ${viewCount} Views</span></div><div class="action-bar"><button id="likeBtn-${postId}" onclick="handleLike('${postId}')" class="action-btn ${isLiked? 'liked' : ''}"><i class="${isLiked? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> Like</button><button onclick="window.location.href='comments.html?id=${postId}'" class="action-btn"><i class="fa-regular fa-comment"></i> Comment</button><button class="action-btn"><i class="fa-solid fa-share"></i> Share</button></div></div>`;
+            });
+            document.getElementById('postsList').insertAdjacentHTML('beforeend', htmlToAdd);
+            posts.forEach((p) => { if(p.isMonetized && adsData.length > 0){ setTimeout(() => runAdScript(`creator-ad-${p.id}`), 100); } setTimeout(() => { const el = document.getElementById(`post-${p.id}`); if(el) viewObserver.observe(el); }, 200); listenToViewCount(p.id); });
+        } catch(err) { console.log("LoadPost Error:", err); document.getElementById('postsList').innerHTML = "<p style='color:white; text-align:center;'>পোস্ট লোড করতে সমস্যা হচ্ছে</p>"; }
+        isLoading = false;
+    };
+
+    function runAdScript(slotId){ const slot = document.getElementById(slotId); if(!slot || adsData.length === 0) return; const randomAd = adsData[Math.floor(Math.random() * adsData.length)]; slot.innerHTML = randomAd.script; Array.from(slot.getElementsByTagName("script")).forEach(oldScript => { const newScript = document.createElement("script"); Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value)); newScript.appendChild(document.createTextNode(oldScript.innerHTML)); oldScript.parentNode.replaceChild(newScript, oldScript); }); }
+    const viewObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { const postId = entry.target.dataset.postid; if (entry.isIntersecting &&!viewedPosts.has(postId)) { setTimeout(() => { addView(postId); viewedPosts.add(postId); viewObserver.unobserve(entry.target); }, 800); } }); }, { threshold: 0.3 });
+    window.addView = async (postId) => { const postRef = doc(db, "posts", postId); await updateDoc(postRef, { views: arrayUnion(currentUser.uid) }); }
+    function listenToViewCount(postId){ const postRef = doc(db, "posts", postId); onSnapshot(postRef, (docSnap) => { if(docSnap.exists()){ const data = docSnap.data(); const realViewCount = data.views?.length || 0; const viewSpan = document.getElementById(`viewCount-${postId}`); if(viewSpan){ const comments = viewSpan.innerText.split('•')[0].trim(); viewSpan.innerText = `${comments} • ${realViewCount} Views`; } } }); }
+    window.handleLike = async (postId, isDoubleTap = false) => {
+        const postRef = doc(db, "posts", postId); const btn = document.getElementById(`likeBtn-${postId}`); const postSnap = await getDoc(postRef); const likes = postSnap.data().likes || []; let isLikedNow = likes.includes(currentUser.uid);
+        if(!isLikedNow) { await updateDoc(postRef, { likes: arrayUnion(currentUser.uid) }); isLikedNow = true; document.getElementById("likeSound").play(); }
+        else if (!isDoubleTap) { await updateDoc(postRef, { likes: arrayRemove(currentUser.uid) }); isLikedNow = false; }
+        btn.classList.toggle('liked', isLikedNow); btn.innerHTML = `<i class="${isLikedNow? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> Like`; const newCount = isLikedNow? likes.length + 1 : likes.length - 1; document.getElementById(`likeCount-${postId}`).innerHTML = `<i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${newCount}`;
+    }
+    let scrollTimeout; window.addEventListener('scroll', () => { clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) { loadPosts(); } }, 200); });
+</script>
+</body>
+</html>
