@@ -6,22 +6,27 @@
     <title>Comments - My Book</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; }
         .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; }
         header { padding: 15px; background: white; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 99; display: flex; align-items: center; gap: 10px; }
         header i { font-size: 22px; cursor: pointer; }
+        header h3 { margin:0; }
         .comment { display: flex; gap: 10px; padding: 12px 15px; border-bottom: 1px solid #f0f2f5; }
-        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; flex-shrink: 0; }
+        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; flex-shrink: 0; background:#eee; }
         .comment-body { flex: 1; }
         .comment-header { display: flex; justify-content: space-between; align-items: center; }
         .comment-name { font-weight: bold; font-size: 14px; cursor: pointer; }
+        .more-btn { font-size: 18px; color: #555; cursor: pointer; padding: 5px; }
+        .reply-tag { font-size: 12px; color: #007bff; font-weight: 600; }
         .follow-btn { background: #007bff; color: white; border: none; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .follow-btn.following { background: #ccc; color: #333; }
-        .comment-text { margin: 5px 0; font-size: 15px; color: #333; }
-        .comment-actions { display: flex; gap: 20px; font-size: 13px; color: #555; }
-        .comment-actions span { cursor: pointer; }
+        .comment-text { margin: 5px 0; font-size: 15px; color: #333; word-break: break-word; }
+        .edited-badge { font-size: 11px; color: #888; font-style: italic; }
+        .comment-actions { display: flex; gap: 20px; font-size: 13px; color: #555; margin-top: 5px; }
+        .comment-actions span { cursor: pointer; display:flex; align-items:center; gap:5px; }
         .comment-actions span:hover { color: #007bff; }
+        .like-btn.liked { color: #007bff; font-weight: bold; }
         .reply-box { display: flex; gap: 8px; margin-top: 8px; padding-left: 50px; }
         .reply-box input { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 18px; outline: none; font-size: 14px; }
         .reply-box button { background: #007bff; color: white; border: none; border-radius: 18px; padding: 0 15px; cursor: pointer; }
@@ -33,7 +38,30 @@
         .nav-btn{ flex:1; text-align:center; cursor:pointer; }
         .nav-btn i{ font-size:26px; color:#444; }
         .nav-btn:active i{ color:#007bff; }
-        .offline { color: red; text-align: center; font-weight: bold; margin-top: 20px; padding: 20px; }
+        
+        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; opacity: 0; transition: 0.3s; }
+        .sheet-overlay.show { display: block; opacity: 1; }
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 20px 20px 0 0; padding: 20px; z-index: 1001; transition: 0.3s cubic-bezier(.4,0,.2,1); }
+        .bottom-sheet.show { bottom: 0; }
+        .sheet-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 500; }
+        .sheet-item:active { background: #f0f2f5; }
+        .sheet-item i { font-size: 20px; width: 25px; }
+        .sheet-item.delete { color: #ff3b30; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1002; display: none; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 20px; animation: pop 0.3s; }
+        @keyframes pop { from {transform: scale(0.8);} to {transform: scale(1);} }
+        .modal-content h4 { margin: 0 0 15px; }
+        .modal-content textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; resize: none; font-size: 15px; font-family: 'Segoe UI'; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end; }
+        .modal-actions button { padding: 10px 20px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn-cancel { background: #f0f2f5; }
+        .btn-save { background: #007bff; color: white; }
+        .btn-delete { background: #ff3b30; color: white; }
+
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 12px 20px; border-radius: 25px; z-index: 9999; opacity: 0; transition: 0.3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
@@ -42,7 +70,7 @@
 <div class="container">
     <header>
         <i class="fa-solid fa-arrow-left" onclick="history.back()"></i>
-        <h3 style="margin:0;">Comments</h3>
+        <h3>Comments</h3>
     </header>
     <div id="commentList">Loading...</div>
 </div>
@@ -56,23 +84,70 @@
     <div class="nav-btn" onclick="window.location.href='home.html'"><i class="fa-solid fa-house"></i></div>
     <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
     <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
     <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+    <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
 </div>
+
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+<div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-item" id="editBtn" onclick="openEditModal()"><i class="fa-solid fa-pen"></i> Edit Comment</div>
+    <div class="sheet-item" onclick="copyComment()"><i class="fa-solid fa-copy"></i> Copy Comment</div>
+    <div class="sheet-item" onclick="reportComment()"><i class="fa-solid fa-flag"></i> Report Comment</div>
+    <div class="sheet-item delete" id="deleteBtn" onclick="openDeleteModal()"><i class="fa-solid fa-trash"></i> Delete Comment</div>
+    <div class="sheet-item" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i> Cancel</div>
+</div>
+
+<div class="modal" id="editModal"><div class="modal-content"><h4>Edit Comment</h4><textarea id="editInput" rows="3"></textarea><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-save" onclick="saveEdit()">Save</button></div></div></div>
+<div class="modal" id="deleteModal"><div class="modal-content"><h4>Delete Comment</h4><p>আপনি কি এই Comment Delete করতে চান?</p><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-delete" onclick="confirmDelete()">Delete</button></div></div></div>
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  getDoc,
+  addDoc,
+  collection,
+  serverTimestamp,
+  onSnapshot,
+  runTransaction,
+  query,
+  where,
+  getDocs,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const firebaseConfig = { apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const DEFAULT_AVATAR = "https://i.ibb.co/5x3yZ7N/default.png";
 
 const postId = new URLSearchParams(window.location.search).get("id");
 const commentList = document.getElementById('commentList');
 let currentUserId = "";
 let followingList = [];
+let postOwnerId = "";
+let selectedCommentId = null;
+let selectedCommentText = "";
+let selectedCommentUid = "";
+
+function timeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return `just now`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(timestamp).toLocaleDateString();
+}
 
 onAuthStateChanged(auth, async (user) => {
     if(!user) window.location.href = 'index.html';
@@ -80,116 +155,286 @@ onAuthStateChanged(auth, async (user) => {
         currentUserId = user.uid;
         const userDoc = await getDoc(doc(db, "users", currentUserId));
         followingList = userDoc.data()?.following || [];
-        loadComments();
+        const postSnap = await getDoc(doc(db, "posts", postId));
+        postOwnerId = postSnap.data()?.uid || ""; 
+        listenComments();
     }
 });
 
-// কমেন্ট পোস্ট
-window.postComment = async (replyTo = null) => {
-    const inputId = replyTo ? `replyInput-${replyTo}` : 'commentInput';
-    const text = document.getElementById(inputId).value.trim();
-    if(!text) return;
+function listenComments() {
+    const postRef = doc(db,"posts",postId);
+    onSnapshot(postRef,(snap)=>{ if(snap.exists()){ renderComments(snap.data()); } });
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+async function sendNotification(toUid, type, text, commentId = null) {
+    if (toUid === currentUserId || !toUid) return;
 
     const userDoc = await getDoc(doc(db, "users", currentUserId));
     const userData = userDoc.data();
 
-    // FIX 1: userName আর userPhoto হোম পেজের মতো
-    const newComment = {
-        id: Date.now().toString(),
+    await addDoc(collection(db, "notifications"), {
+        to: toUid,
+        from: currentUserId,
+        fromName: userData.name || userData.userName || "User",
+        fromPhoto: userData.profile || userData.userPhoto || DEFAULT_AVATAR,
+        type: type,
         text: text,
-        uid: currentUserId,
-        userName: userData.userName || userData.name || "User", // 2টাই চেক করবে
-        userPhoto: userData.userPhoto || userData.photoURL || "https://i.ibb.co/5x3yZ7N/default.png",
-        timestamp: Date.now(),
-        replyTo: replyTo
-    };
+        postId: postId,
+        commentId: commentId,
+        read: false,
+        createdAt: serverTimestamp()
+    });
+}
 
+window.postComment = async (replyTo = null, replyToUid = null, replyToName = null) => {
+    const inputId = replyTo ? `replyInput-${replyTo}` : 'commentInput';
+    const text = document.getElementById(inputId).value.trim();
+    if(!text) return showToast("Comment খালি রাখা যাবে না");
+    const userDoc = await getDoc(doc(db, "users", currentUserId));
+    const userData = userDoc.data();
+    const finalText = replyTo ? `@${replyToName} ${text}` : text;
+    const newComment = {
+        id: Date.now().toString(), text: finalText, uid: currentUserId,
+        userName: userData.name || userData.userName || "User",
+        userPhoto: userData.profile || userData.userPhoto || DEFAULT_AVATAR,
+        timestamp: Date.now(), replyTo: replyTo, replyToUid: replyToUid,
+        likes: [], isEdited: false
+    };
     try {
         const postRef = doc(db, "posts", postId);
-        const postSnap = await getDoc(postRef);
-        const currentCount = postSnap.data().commentsCount || 0;
-
-        await updateDoc(postRef, {
-            comments: arrayUnion(newComment),
-            commentsCount: currentCount + 1
+        await runTransaction(db, async (transaction) => {
+            const postSnap = await transaction.get(postRef);
+            const currentCount = postSnap.data().commentsCount || 0;
+            transaction.update(postRef, { comments: arrayUnion(newComment), commentsCount: currentCount + 1 });
         });
         document.getElementById(inputId).value = "";
-        document.getElementById("notiSound").play();
-        loadComments();
-    } catch (e) {
-        alert("Error: " + e.message);
-    }
-};
+document.getElementById("notiSound").play();
+if(replyTo) { 
+    await sendNotification(
+        replyToUid,
+        "reply",
+        `${newComment.userName} replied: ${text}`,
+        newComment.id
+    ); 
+} 
+else { 
+    await sendNotification(
+        postOwnerId,
+        "comment",
+        `${newComment.userName} commented on your post`,
+        newComment.id
+    ); 
+}
 
-// Follow/Unfollow
+} catch (e) { 
+    showToast("Error: " + e.message); 
+}
+};
+// ✅ FIX: Transaction দিয়ে Race Condition Solve
+window.toggleLike = async (commentId, commentUid) => {
+    const postRef = doc(db, "posts", postId);
+    let shouldSendNoti = false;
+    try {
+        await runTransaction(db, async (transaction) => {
+            const postSnap = await transaction.get(postRef);
+            let comments = postSnap.data().comments || [];
+            const commentIndex = comments.findIndex(c => c.id === commentId);
+            if(commentIndex === -1) throw "Comment not found";
+            
+            const likes = comments[commentIndex].likes || [];
+            if(likes.includes(currentUserId)) {
+                comments[commentIndex].likes = likes.filter(uid => uid !== currentUserId);
+            } else {
+                comments[commentIndex].likes = [...likes, currentUserId];
+                if(commentUid !== currentUserId) shouldSendNoti = true; // Notification Flag
+            }
+            transaction.update(postRef, { comments: comments });
+        });
+        if(shouldSendNoti) {
+    const myData = await getDoc(doc(db,"users",currentUserId));
+    const me = myData.data();
+
+    await sendNotification(
+        commentUid,
+        "like",
+        `${me.name || me.userName} liked your comment`,
+        commentId
+    );
+}
+    } catch(e) { showToast("Like Failed: " + e); }
+}
+
 window.toggleFollow = async (uid, btn) => {
     const isFollowing = followingList.includes(uid);
     const userRef = doc(db, "users", currentUserId);
     const targetRef = doc(db, "users", uid);
-
-    if(isFollowing){
-        // FIX 2: Unfollow এর জন্য arrayRemove
-        await updateDoc(userRef, { following: arrayRemove(uid) });
-        await updateDoc(targetRef, { followers: arrayRemove(currentUserId) });
-        btn.innerText = "Follow";
-        btn.classList.remove("following");
-        followingList = followingList.filter(id => id !== uid);
-    } else {
-        await updateDoc(userRef, { following: arrayUnion(uid) });
-        await updateDoc(targetRef, { followers: arrayUnion(currentUserId) });
-        btn.innerText = "Following";
-        btn.classList.add("following");
-        followingList.push(uid);
-    }
-    document.getElementById("notiSound").play();
-}
-
-// Reply box show
-window.showReplyBox = (id) => {
-    const box = document.getElementById(`replyBox-${id}`);
-    box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-}
-
-// কমেন্ট লোড
-async function loadComments() {
     try {
-        const snap = await getDoc(doc(db, "posts", postId));
-        const data = snap.data();
-        commentList.innerHTML = "";
+        if(isFollowing){ await updateDoc(userRef, { following: arrayRemove(uid) }); await updateDoc(targetRef, { followers: arrayRemove(currentUserId) }); btn.innerText = "Follow"; btn.classList.remove("following"); followingList = followingList.filter(id => id !== uid); } 
+        else { await updateDoc(userRef, { following: arrayUnion(uid) }); await updateDoc(targetRef, { followers: arrayUnion(currentUserId) }); btn.innerText = "Following"; btn.classList.add("following"); followingList.push(uid); }
+        document.getElementById("notiSound").play();
+    } catch(e) { showToast("Error: " + e.message); }
+}
+
+window.showReplyBox = (id, name) => {
+    const box = document.getElementById(`replyBox-${id}`);
+    const input = document.getElementById(`replyInput-${id}`);
+    if(box.style.display === 'flex') { box.style.display = 'none'; } 
+    else { box.style.display = 'flex'; input.placeholder = `Reply to ${name}...`; input.focus(); }
+}
+
+window.openCommentOptions = (commentId, commentText, commentUid, isOwner) => {
+    selectedCommentId = commentId;
+    selectedCommentText = commentText;
+    selectedCommentUid = commentUid;
+    document.getElementById('editInput').value = commentText;
+    document.getElementById('editBtn').style.display = isOwner ? 'flex' : 'none';
+    document.getElementById('deleteBtn').style.display = isOwner ? 'flex' : 'none';
+    document.getElementById('sheetOverlay').classList.add('show');
+    document.getElementById('bottomSheet').classList.add('show');
+}
+window.closeSheet = () => { document.getElementById('sheetOverlay').classList.remove('show'); document.getElementById('bottomSheet').classList.remove('show'); }
+window.openEditModal = () => { closeSheet(); document.getElementById('editModal').classList.add('show'); }
+window.openDeleteModal = () => { closeSheet(); document.getElementById('deleteModal').classList.add('show'); }
+window.closeModal = () => { document.getElementById('editModal').classList.remove('show'); document.getElementById('deleteModal').classList.remove('show'); }
+window.copyComment = () => { 
+    if (navigator.clipboard) { navigator.clipboard.writeText(selectedCommentText); } 
+    else { const ta = document.createElement('textarea'); ta.value = selectedCommentText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+    showToast("Comment Copied"); closeSheet(); 
+}
+window.reportComment = async () => {
+    try {
+        await addDoc(collection(db, "reports"), {
+            type: "comment", postId: postId, commentId: selectedCommentId,
+            reportedBy: currentUserId, reportedUser: selectedCommentUid,
+            commentText: selectedCommentText, status: "pending", createdAt: serverTimestamp()
+        });
+        showToast("Comment Reported to Admin");
+        closeSheet();
+    } catch(e) { showToast("Report Failed: " + e.message); }
+}
+
+// ✅ FIX: Transaction দিয়ে Edit
+window.saveEdit = async () => {
+    const newText = document.getElementById('editInput').value.trim();
+    if(!newText) return showToast("Comment খালি রাখা যাবে না");
+    try {
+        const postRef = doc(db, "posts", postId);
+        await runTransaction(db, async (transaction) => {
+            const postSnap = await transaction.get(postRef);
+            let comments = postSnap.data().comments || [];
+            const commentIndex = comments.findIndex(c => c.id === selectedCommentId);
+            if(commentIndex > -1) {
+                comments[commentIndex].text = newText;
+                comments[commentIndex].isEdited = true;
+                transaction.update(postRef, { comments: comments });
+            }
+        });
+        showToast("Comment Updated");
+        closeModal();
+    } catch(e) { showToast("Update Failed: " + e.message); }
+}
+
+// ✅ FIX: Transaction + Notification Delete
+window.confirmDelete = async () => {
+    try {
+        const postRef = doc(db, "posts", postId);
+        await runTransaction(db, async (transaction) => {
+            const postSnap = await transaction.get(postRef);
+            let comments = postSnap.data().comments || [];
+            const currentCount = postSnap.data().commentsCount || 0;
+            const commentsToDelete = comments.filter(c => c.id === selectedCommentId || c.replyTo === selectedCommentId);
+            const remainingComments = comments.filter(c => c.id !== selectedCommentId && c.replyTo !== selectedCommentId);
+            transaction.update(postRef, { comments: remainingComments, commentsCount: currentCount - commentsToDelete.length });
+        });
+    // Comment related notification delete
+const notiQuery = query(
+    collection(db, "notifications"),
+    where("commentId", "==", selectedCommentId)
+);
+
+const notiSnap = await getDocs(notiQuery);
+
+for (const d of notiSnap.docs) {
+    await deleteDoc(doc(db, "notifications", d.id));
+}
         
+        showToast("Comment Deleted");
+        closeModal();
+    } catch(e) { showToast("Delete Failed: " + e.message); }
+}
+
+function renderComments(data) {
+    try {
+        commentList.innerHTML = "";
         if (data.comments && data.comments.length > 0) {
             const mainComments = data.comments.filter(c => !c.replyTo).sort((a,b) => b.timestamp - a.timestamp);
-            
             mainComments.forEach(c => {
                 const isFollowing = followingList.includes(c.uid);
                 const replies = data.comments.filter(r => r.replyTo === c.id).sort((a,b) => a.timestamp - b.timestamp);
+                const name = c.userName || "User";
+                const photo = c.userPhoto || DEFAULT_AVATAR;
+                const isOwner = c.uid === currentUserId;
+                const likes = c.likes || [];
+                const isLiked = likes.includes(currentUserId);
 
                 commentList.innerHTML += `
                     <div class="comment">
-                        <img src="${c.userPhoto}" class="comment-avatar" onclick="window.location.href='user-profile.html?uid=${c.uid}'">
+                        <img src="${photo}" class="comment-avatar" onerror="this.src='${DEFAULT_AVATAR}'" onclick="window.location.href='user-profile.html?uid=${c.uid}'">
                         <div class="comment-body">
                             <div class="comment-header">
-                                <span class="comment-name" onclick="window.location.href='user-profile.html?uid=${c.uid}'">${c.userName}</span>
+                                <span class="comment-name" onclick="window.location.href='user-profile.html?uid=${c.uid}'">${name}</span>
+                                <div style="display:flex; align-items:center; gap:8px;">
                                 ${c.uid !== currentUserId ? `<button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${c.uid}', this)">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+                                <i class="fa-solid fa-ellipsis-vertical more-btn" onclick="openCommentOptions('${c.id}', \`${c.text.replace(/`/g, "'")}\`, '${c.uid}', ${isOwner})"></i>
+                                </div>
                             </div>
                             <p class="comment-text">${c.text}</p>
+                            ${c.isEdited ? `<span class="edited-badge">Edited</span>` : ''}
                             <div class="comment-actions">
-                                <span onclick="showReplyBox('${c.id}')"><i class="fa-regular fa-comment"></i> Reply</span>
+                                <span class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${c.id}', '${c.uid}')"><i class="fa-solid fa-thumbs-up"></i> Like ${likes.length > 0 ? likes.length : ''}</span>
+                                <span onclick="showReplyBox('${c.id}', '${name}')"><i class="fa-regular fa-comment"></i> Reply</span>
+                                <span style="margin-left:auto; font-size:12px; color:#888;">${timeAgo(c.timestamp)}</span>
                             </div>
                             <div class="reply-box" id="replyBox-${c.id}" style="display:none;">
                                 <input type="text" id="replyInput-${c.id}" placeholder="Write a reply...">
-                                <button onclick="postComment('${c.id}')">Reply</button>
+                                <button onclick="postComment('${c.id}', '${c.uid}', '${name}')">Reply</button>
                             </div>
                             <div class="replies">
-                                ${replies.map(r => `
+                                ${replies.map(r => {
+                                    const rName = r.userName || "User";
+                                    const rPhoto = r.userPhoto || DEFAULT_AVATAR;
+                                    const rIsOwner = r.uid === currentUserId;
+                                    const rIsFollowing = followingList.includes(r.uid); // FIX: Reply Follow
+                                    const rLikes = r.likes || [];
+                                    const rIsLiked = rLikes.includes(currentUserId);
+                                    return `
                                     <div class="comment" style="padding:8px 0;">
-                                        <img src="${r.userPhoto}" class="comment-avatar" style="width:32px; height:32px;" onclick="window.location.href='user-profile.html?uid=${r.uid}'">
+                                        <img src="${rPhoto}" class="comment-avatar" style="width:32px; height:32px;" onerror="this.src='${DEFAULT_AVATAR}'" onclick="window.location.href='user-profile.html?uid=${r.uid}'">
                                         <div class="comment-body">
-                                            <span class="comment-name" onclick="window.location.href='user-profile.html?uid=${r.uid}'">${r.userName}</span>
+                                            <div class="comment-header">
+                                                <span class="comment-name" onclick="window.location.href='user-profile.html?uid=${r.uid}'">${rName}</span>
+                                                <div style="display:flex; align-items:center; gap:5px;">
+                                                ${r.uid !== currentUserId ? `<button class="follow-btn ${rIsFollowing ? 'following' : ''}" style="padding:2px 8px; font-size:10px;" onclick="toggleFollow('${r.uid}', this)">${rIsFollowing ? 'Following' : 'Follow'}</button>` : ''}
+                                                <i class="fa-solid fa-ellipsis-vertical more-btn" style="font-size:14px;" onclick="openCommentOptions('${r.id}', \`${r.text.replace(/`/g, "'")}\`, '${r.uid}', ${rIsOwner})"></i>
+                                                </div>
+                                            </div>
+                                            <span class="reply-tag"> replied</span>
                                             <p class="comment-text">${r.text}</p>
+                                            ${r.isEdited ? `<span class="edited-badge">Edited</span>` : ''}
+                                            <div class="comment-actions" style="font-size:12px;">
+                                                <span class="like-btn ${rIsLiked ? 'liked' : ''}" onclick="toggleLike('${r.id}', '${r.uid}')"><i class="fa-solid fa-thumbs-up"></i> Like ${rLikes.length > 0 ? rLikes.length : ''}</span>
+                                                <span style="margin-left:auto; font-size:11px; color:#888;">${timeAgo(r.timestamp)}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                `).join('')}
+                                `}).join('')}
                             </div>
                         </div>
                     </div>
