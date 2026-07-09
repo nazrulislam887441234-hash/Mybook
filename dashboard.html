@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - My Book</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding-bottom: 80px; }
+
+header { background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.logo { font-size: 20px; font-weight: bold; color: #007bff; display: flex; align-items: center; gap: 8px; }
+.logo img { width:30px; height:30px; border-radius:8px; }
+.refresh-btn { background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+
+.container { width: 100%; max-width: 700px; margin: 15px auto; padding: 0 15px; }
+
+.filter-bar {
+    display: flex; gap: 10px; background: white; padding: 12px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.filter-btn {
+    flex: 1; padding: 10px; border: none; border-radius: 10px; background: #f0f2f5; font-weight: 600; cursor: pointer; font-size: 14px;
+}
+.filter-btn.active { background: linear-gradient(45deg, #007bff, #00d4ff); color: white; }
+
+.card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+.card h3 { font-size: 18px; margin-bottom: 15px; color: #333; display: flex; align-items: center; gap: 8px; }
+
+.monetize-status { text-align: center; padding: 12px; border-radius: 15px; font-weight: 700; margin-bottom: 15px; }
+.status-on { background: #d4edda; color: #155724; }
+.status-off { background: #f8d7da; color: #721c24; }
+
+.revenue-note {
+    background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; font-size: 13px; text-align: center; margin-bottom: 15px; border-left: 4px solid #ffc107;
+}
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.stat-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px; border-radius: 15px; text-align: center; }
+.stat-box:nth-child(2) { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+.stat-box:nth-child(3) { background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%); }
+.stat-box:nth-child(4) { background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%); }
+.stat-box:nth-child(5) { background: linear-gradient(135deg, #17a2b8 0%, #007bff 100%); }
+.stat-box:nth-child(6) { background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); }
+.stat-number { font-size: 22px; font-weight: 800; }
+.stat-label { font-size: 12px; opacity: 0.9; }
+
+.post-row { display: flex; gap: 12px; padding: 12px; background: #f8f9fa; border-radius: 15px; margin-bottom: 10px; }
+.post-row img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
+.post-info { flex: 1; }
+.post-info p { font-size: 14px; font-weight: 600; color: #333; }
+.post-stats span { font-size: 12px; margin-right: 10px; color: #666; }
+
+.loading { text-align: center; padding: 30px; color: #777; }
+
+.nav-bar { position: fixed; bottom: 0; width: 100%; max-width: 700px; left: 50%; transform: translateX(-50%); background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 99; border-radius: 20px 20px 0 0; }
+.nav-btn { font-size: 22px; cursor: pointer; color: #555; }
+.nav-btn.active { color: #007bff; }
+
+@media(max-width: 500px){
+  .earning-wrapper { flex-direction: column; }
+  .earning-disclaimer { flex: 1; width: 100%; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo"><img src="https://i.ibb.co/FqYZrjH3/20260609-103856.png"> Dashboard</div>
+    <button class="refresh-btn" onclick="loadData(currentRange, document.querySelector('.filter-btn.active'))"><i class="fa-solid fa-rotate"></i></button>
+</header>
+
+<div class="container">
+
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="loadData('month', this)">এই মাস</button>
+        <button class="filter-btn" onclick="loadData('week', this)">৭ দিন</button>
+        <button class="filter-btn" onclick="loadData('all', this)">All Time</button>
+    </div>
+
+    <div class="card">
+        <h3><i class="fa-solid fa-wallet"></i> Monetization</h3>
+        <div id="monetizeStatus" class="monetize-status">Loading...</div>
+
+        <div class="revenue-note">
+            <i class="fa-solid fa-info-circle"></i> Ad Revenue এর 40% আপনাকে দেওয়া হবে। হিসাব আনুমানিক
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box"><div class="stat-number" id="totalViews">0</div><div class="stat-label">Views</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalLikes">0</div><div class="stat-label">Likes</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalComments">0</div><div class="stat-label">Comments</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalShares">0</div><div class="stat-label">Shares</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalPosts">0</div><div class="stat-label">Posts</div></div>
+            <div class="stat-box"><div class="stat-number" id="totalFollowers">0</div><div class="stat-label">Followers</div></div>
+        </div>
+
+        <p id="dateRange" style="font-size:12px; color:#666; text-align:center; margin-top:15px;"></p>
+        <canvas id="viewsChart" style="margin-top:20px;"></canvas>
+    </div>
+
+    <div class="card">
+        <h3><i class="fa-solid fa-fire"></i> <span id="topTitle">এই মাসের</span> Top Posts</h3>
+        <div id="topPostsList"><p class="loading">Loading...</p></div>
+    </div>
+
+    <div class="card">
+        <h3><i class="fa-solid fa-trophy"></i> All Time Overview</h3>
+        <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="stat-box"><div class="stat-number" id="allTimeViews">0</div><div class="stat-label">All Time Views</div></div>
+            <div class="stat-box"><div class="stat-number" id="allTimePosts">0</div><div class="stat-label">All Time Posts</div></div>
+        </div>
+    </div>
+
+</div>
+
+<div class="nav-bar">
+    <div class="nav-btn" onclick="window.location.href='foryou.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
+    <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn active"><i class="fa-solid fa-chart-line"></i></div>
+    <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+      <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const app = initializeApp({apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95"});
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const bnMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+let currentUser;
+let chart;
+let currentRange = 'month';
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) return window.location.href = "index.html";
+    currentUser = user;
+    loadData('month', document.querySelector('.filter-btn'));
+});
+
+async function loadData(range, btn) {
+    currentRange = range;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const now = new Date();
+    let startDate, endDate, title = "";
+
+    if(range === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        title = `${bnMonths[now.getMonth()]} ${now.getFullYear()}`;
+    }
+    if(range === 'week') {
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 7);
+        endDate = now;
+        title = "গত ৭ দিন";
+    }
+    if(range === 'all') {
+        startDate = new Date(2020, 0, 1);
+        endDate = now;
+        title = "All Time";
+    }
+
+    const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+    const userData = userSnap.data();
+
+    const isMonetized = userData.isMonetized;
+    document.getElementById('monetizeStatus').innerHTML = isMonetized
+      ? `<i class="fa-solid fa-circle-check"></i> Monetization: ON`
+        : `<i class="fa-solid fa-circle-xmark"></i> Monetization: OFF`;
+    document.getElementById('monetizeStatus').className = `monetize-status ${isMonetized? 'status-on' : 'status-off'}`;
+    document.getElementById('totalFollowers').innerText = userData.followers?.length || 0;
+
+    const q = query(collection(db, "posts"), where("uid", "==", currentUser.uid));
+    const snap = await getDocs(q);
+
+    let totalViews=0, totalLikes=0, totalComments=0, totalShares=0, posts=0;
+    let allTimeViews=0, allTimePosts=0;
+    let postsArray = [];
+    let dailyData = {};
+
+    snap.forEach(d => {
+        const post = d.data();
+        const createdAt = post.createdAt?.toDate() || new Date(2020,0,1);
+        const views = post.views?.length || 0;
+        const likes = post.likes?.length || 0;
+        const comments = post.commentsCount || 0;
+        const shares = post.shares || 0;
+
+        allTimeViews += views;
+        allTimePosts++;
+
+        if(createdAt >= startDate && createdAt <= endDate) {
+            posts++;
+            totalViews += views;
+            totalLikes += likes;
+            totalComments += comments;
+            totalShares += shares;
+
+            const day = createdAt.toLocaleDateString('bn-BD');
+            dailyData[day] = (dailyData[day] || 0) + views;
+
+            postsArray.push({id: d.id, caption: post.caption || "No Caption", imageUrl: post.imageUrl, views: views, likes: likes});
+        }
+    });
+
+    document.getElementById('totalViews').innerText = totalViews.toLocaleString('en-IN');
+    document.getElementById('totalLikes').innerText = totalLikes.toLocaleString('en-IN');
+    document.getElementById('totalComments').innerText = totalComments.toLocaleString('en-IN');
+    document.getElementById('totalShares').innerText = totalShares.toLocaleString('en-IN');
+    document.getElementById('totalPosts').innerText = posts;
+    document.getElementById('allTimeViews').innerText = allTimeViews.toLocaleString('en-IN');
+    document.getElementById('allTimePosts').innerText = allTimePosts;
+
+    postsArray.sort((a,b) => b.views - a.views);
+    let html = "";
+    if(postsArray.length === 0) {
+        html = `<p style="text-align:center; color:#777;">কোনো ডাটা নেই</p>`;
+    } else {
+        postsArray.slice(0,5).forEach(p => {
+            html += `<div class="post-row"><img src="${p.imageUrl}"><div class="post-info"><p>${p.caption.substring(0,30)}...</p><div class="post-stats"><span><i class="fa-solid fa-eye"></i> ${p.views}</span><span><i class="fa-solid fa-thumbs-up"></i> ${p.likes}</span></div></div></div>`;
+        });
+    }
+    document.getElementById('topPostsList').innerHTML = html;
+
+    if(chart) chart.destroy();
+    const ctx = document.getElementById('viewsChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Object.keys(dailyData),
+            datasets: [{
+                label: 'Daily Views',
+                data: Object.values(dailyData),
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.2)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+</script>
+</body>
+</html>
