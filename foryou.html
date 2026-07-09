@@ -5,27 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For You - My Book</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 70px; }
-        header { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .logo { font-size: 22px; font-weight: bold; color: #007bff; display: flex; align-items: center; gap: 10px; }
-        .tab-bar { display: flex; background: white; border-bottom: 1px solid #ddd; }
-        .tab-btn { flex: 1; padding: 14px; border: none; background: none; font-size: 16px; font-weight: bold; cursor: pointer; color: #555; text-decoration: none; text-align: center; }
-        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
-        .post-card { background: white; margin-bottom: 15px; padding: 15px; }
-        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; }
-        .stats { display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; margin-top: 10px; }
-        .stats button { border:none; background:none; cursor:pointer; font-size: 15px; color: #555; }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
-        .nav-btn { font-size: 22px; cursor: pointer; color: #555; }
-        .loader { width: 50px; height: 50px; border: 5px solid #ddd; border-top: 5px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-    </style>
+  <style>
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent;
+}
+
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background: #f0f2f5; 
+    margin: 0; 
+    padding-bottom: 70px; 
+}
+
+header { 
+    background: white; 
+    padding: 10px 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+
+.logo { 
+    font-size: 22px; 
+    font-weight: bold; 
+    color: #007bff; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+.tab-bar { 
+    display: flex; 
+    background: white; 
+    border-bottom: 1px solid #ddd; 
+    position: sticky; 
+    top: 56px; 
+    z-index: 99; 
+}
+
+.tab-btn { 
+    flex: 1; 
+    padding: 14px; 
+    border: none; 
+    background: none; 
+    font-size: 16px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    color: #555; 
+    text-decoration: none; 
+    text-align: center; 
+}
+
+.tab-btn.active { 
+    color:#007bff; 
+    border-bottom:3px solid #007bff; 
+}
+
+
+.post-card { 
+    background:white; 
+    margin-bottom:15px; 
+    padding:15px; 
+}
+
+.post-header { 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+    margin-bottom:10px; 
+}
+
+
+/* IMAGE AREA FIX */
+
+.img-wrapper { 
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    background:#eee;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:10px;
+}
+
+
+.img-skeleton { 
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        #eee 25%,
+        #ddd 50%,
+        #eee 75%
+    );
+    background-size:200% 100%;
+    animation:loading 1.5s infinite;
+}
+
+
+@keyframes loading {
+    0% { 
+        background-position:200% 0; 
+    }
+    100% { 
+        background-position:-200% 0; 
+    }
+}
+
+
+.post-img { 
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:10px;
+    opacity:0;
+    transition:opacity .3s;
+}
+
+
+
+/* LIKE COMMENT SHARE */
+
+.stats-bar { 
+    display:flex; 
+    justify-content:space-between; 
+    padding:8px 5px; 
+    font-size:14px; 
+    color:#555; 
+    border-bottom:1px solid #eee; 
+    margin-top:10px;
+}
+
+.action-bar { 
+    display:flex; 
+    justify-content:space-around; 
+    padding:5px 0;
+}
+
+.action-btn { 
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:none;
+    background:none;
+    cursor:pointer;
+    padding:8px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:600;
+    color:#555;
+}
+
+.action-btn:hover { 
+    background:#f0f2f5;
+}
+
+.action-btn.liked { 
+    color:#1877f2;
+}
+
+
+/* NAVIGATION */
+
+.nav-bar { 
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:white;
+    display:flex;
+    justify-content:space-around;
+    padding:15px;
+    box-shadow:0 -2px 5px rgba(0,0,0,.1);
+    z-index:99;
+}
+
+.nav-btn { 
+    font-size:22px;
+    cursor:pointer;
+    color:#555;
+}
+
+
+/* LOADER */
+
+.loader { 
+    width:50px;
+    height:50px;
+    border:5px solid #ddd;
+    border-top:5px solid #007bff;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    margin:40px auto;
+}
+
+@keyframes spin { 
+    100% { 
+        transform:rotate(360deg); 
+    }
+}
+
+
+/* ADS */
+
+.ad-card { 
+    background:white;
+    margin-bottom:15px;
+    padding:10px;
+    border:1px dashed #ccc;
+    text-align:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    min-height:100px;
+}
+
+.ad-label { 
+    font-size:12px;
+    color:#777;
+    margin-bottom:8px;
+    text-align:center;
+    width:100%;
+    font-weight:bold;
+}
+
+.creator-ad { 
+    margin:10px 0;
+    padding:12px;
+    background:#fff8e1;
+    border-radius:10px;
+    border:1px solid #ffe082;
+    min-height:100px;
+}
+
+
+/* FULL PAGE LOADER */
+
+.full-loader { 
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
+}
+</style>
 </head>
 <body>
 <audio id="likeSound"><source src="like.mp3" type="audio/mpeg"></audio>
+
+<div class="full-loader" id="fullLoader">
+    <div class="loader"></div>
+    <p style="margin-top:15px; font-weight:bold;">For You Post Loading...</p>
+</div>
 
 <header>
     <div class="logo"><img src="https://i.ibb.co.com/FqYZrjH3/20260609-103856.png" width="30"> My Book</div>
@@ -42,128 +292,190 @@
     <div class="nav-btn" onclick="window.location.href='home.html'"><i class="fa-solid fa-house"></i></div>
     <div class="nav-btn" onclick="window.location.href='post.html'"><i class="fa-solid fa-plus"></i></div>
     <div class="nav-btn" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i></div>
+    <div class="nav-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-line"></i></div>
     <div class="nav-btn" onclick="window.location.href='https://ghotimarket.com'"><i class="fa-solid fa-store"></i></div>
+    <div class="nav-btn" onclick="window.location.href='notification.html'"><i class="fa-solid fa-bell"></i></div/>
 </div>
 
-<script type="module">  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";  
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";  
-import { getFirestore, collection, getDocs, getDoc, query, limit, startAfter, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+getFirestore, collection, getDocs, getDoc, query, limit, startAfter, doc, updateDoc, arrayUnion, arrayRemove, addDoc, serverTimestamp, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {  apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",  authDomain: "mybook-95b97.firebaseapp.com",  projectId: "mybook-95b97",  storageBucket: "mybook-95b97.firebasestorage.app",  messagingSenderId: "689741505296",  appId: "1:689741505296:web:818d83962a0825f64a7b95"  };  
-const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(); 
+const firebaseConfig = { apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw", authDomain: "mybook-95b97.firebaseapp.com", projectId: "mybook-95b97", storageBucket: "mybook-95b97.firebasestorage.app", messagingSenderId: "689741505296", appId: "1:689741505296:web:818d83962a0825f64a7b95" };
+const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth();
 
-let allPostsBuffer = []; let displayedCount = 0;  const POSTS_PER_LOAD = 5; const FETCH_LIMIT = 20; 
+let allPostsBuffer = []; let displayedCount = 0; const POSTS_PER_LOAD = 5; const FETCH_LIMIT = 20;
 let currentUserId = ""; let followingList = []; let lastDoc = null; let isLoading = false;
+let adsData = []; let userDataCache = {}; let viewedPosts = new Set();
 
-onAuthStateChanged(auth, (user) => {  
-    if (!user) window.location.href = 'index.html';  
-    else {  currentUserId = user.uid; loadFeed(true);  }  
-});  
+async function sendNotification(toUid, type, text, postId = null){
+    if(!toUid || toUid === currentUserId) return;
+    const userSnap = await getDoc(doc(db,"users",currentUserId));
+    const user = userSnap.data();
+    await addDoc(collection(db,"notifications"),{
+        to: toUid, from: currentUserId, fromName: user.name || user.userName || "User",
+        fromPhoto: user.profile || user.userPhoto || "", type: type, text: text, postId: postId, read:false, createdAt: serverTimestamp()
+    });
+}
 
-window.loadFeed = async function(isInitial = false) {  
+onAuthStateChanged(auth, async (user) => {
+    if (!user) window.location.href = 'index.html';
+    else { currentUserId = user.uid; await loadAds(); await loadFeed(true); document.getElementById('fullLoader').style.display = 'none'; }
+});
+
+async function loadAds(){
+    const adsSnap = await getDocs(collection(db, "ads"));
+    adsData = [];
+    adsSnap.forEach(doc => adsData.push({id: doc.id,...doc.data()}));
+}
+
+async function getUserData(uid){
+    if(!userDataCache[uid]){
+        const snap = await getDoc(doc(db, "users", uid));
+        userDataCache[uid] = snap.data();
+    }
+    return userDataCache[uid];
+}
+
+window.loadFeed = async function(isInitial = false) {
     if(isLoading) return; isLoading = true;
-    const feed = document.getElementById("feed");  
-    if (isInitial) {  feed.innerHTML = `<div style="text-align:center;padding:40px;"><div class="loader"></div><p>Loading...</p></div>`;  displayedCount = 0;  allPostsBuffer = []; lastDoc = null; }  
+    const feed = document.getElementById("feed");
+    if (isInitial) { feed.innerHTML = `<div style="text-align:center;padding:40px;"><div class="loader"></div></div>`; displayedCount = 0; allPostsBuffer = []; lastDoc = null; }
 
-    const userDoc = await getDoc(doc(db, "users", currentUserId));  
-    followingList = userDoc.data()?.following || [];  
+    const userDoc = await getDoc(doc(db, "users", currentUserId));
+    followingList = userDoc.data()?.following || [];
 
-    // FIX: orderBy বাদ। হোম পেজের মতো
-    let q; 
-    if(lastDoc){ q = query(collection(db, "posts"), startAfter(lastDoc), limit(FETCH_LIMIT));  } 
-    else { q = query(collection(db, "posts"), limit(FETCH_LIMIT));  }
-    
-    const snap = await getDocs(q);  
-    if(snap.empty) {  if(isInitial) feed.innerHTML = `<p style="text-align:center;padding:40px;">কোনো পোস্ট নেই</p>`; lastDoc = null;  isLoading = false;  return; }
+    let q;
+    if(lastDoc){ q = query(collection(db, "posts"), startAfter(lastDoc), limit(FETCH_LIMIT)); }
+    else { q = query(collection(db, "posts"), limit(FETCH_LIMIT)); }
+
+    const snap = await getDocs(q);
+    if(snap.empty) { if(isInitial) feed.innerHTML = `<p style="text-align:center;padding:40px;">কোনো পোস্ট নেই</p>`; lastDoc = null; isLoading = false; return; }
     lastDoc = snap.docs[snap.docs.length - 1];
-    
-    snap.forEach((docSnap) => { 
+
+    snap.forEach((docSnap) => {
         const p = docSnap.data();
-        if(!p.createdAt) p.createdAt = {seconds: 0}; // createdAt না থাকলে 0
-        allPostsBuffer.push({id: docSnap.id, ...p});
+        if(!p.createdAt) p.createdAt = {seconds: 0};
+        if(!allPostsBuffer.find(x => x.id === docSnap.id)) allPostsBuffer.push({id: docSnap.id,...p});
     });
 
-    // VIRAL ALGORITHM - JS দিয়ে Sort
     allPostsBuffer.forEach(p => {
         const postTime = p.createdAt?.seconds * 1000 || 0;
-        const isNew = (Date.now() - postTime) < 3600000; 
-        const newBoost = isNew ? 2 : 1;
-        p.engagement = (
-            (p.likes?.length || 0) * 5 +
-            (p.commentsCount || 0) * 10 +
-            (p.views?.length || 0) * 0.2 +
-            (followingList.includes(p.uid) ? 50 : 0) 
-        ) * newBoost;
+        const isNew = (Date.now() - postTime) < 3600000;
+        const newBoost = isNew? 2 : 1;
+        p.engagement = ((p.likes?.length || 0) * 5 + (p.commentsCount || 0) * 10 + (p.views?.length || 0) * 0.2 + (followingList.includes(p.uid)? 50 : 0)) * newBoost;
     });
 
-    allPostsBuffer.sort((a, b) => b.engagement - a.engagement); // Viral আগে
+    allPostsBuffer.sort((a, b) => b.engagement - a.engagement);
     allPostsBuffer = allPostsBuffer.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
 
-    renderPosts();
+    await renderPosts();
     isLoading = false;
 };
 
-function renderPosts(){
-    const feed = document.getElementById("feed");  
-    if(displayedCount === 0) feed.innerHTML = "";  
+async function renderPosts(){
+    const feed = document.getElementById("feed");
+    if(displayedCount === 0) feed.innerHTML = "";
 
     const postsToShow = allPostsBuffer.slice(displayedCount, displayedCount + POSTS_PER_LOAD);
-    
-    if(postsToShow.length === 0 && displayedCount === 0){
-        feed.innerHTML = `<p style="text-align:center;padding:40px;">কোনো পোস্ট নেই</p>`;
-        return;
-    }
-    
-    postsToShow.forEach((p) => {  
-        const postId = p.id;  
-        const isLiked = p.likes?.includes(currentUserId);  
+    if(postsToShow.length === 0 && displayedCount === 0){ feed.innerHTML = `<p style="text-align:center;padding:40px;">কোনো পোস্ট নেই</p>`; return; }
+
+    let htmlToAdd = '';
+    for(let i = 0; i < postsToShow.length; i++){
+        const p = postsToShow[i];
+        const postId = p.id;
+        const globalIndex = displayedCount + i;
+        const isLiked = p.likes?.includes(currentUserId);
         const isViewed = p.views?.includes(currentUserId);
         const isFollowing = followingList.includes(p.uid);
         const likeCount = p.likes?.length || 0;
         const commentCount = p.commentsCount || 0;
         const viewCount = p.views?.length || 0;
 
-        feed.innerHTML += `  
-        <div class="post-card" id="post-${postId}" data-postid="${postId}">  
-            <div class="post-header" onclick="window.location.href='user-profile.html?uid=${p.uid}'" style="cursor:pointer;">  
-                <div style="display:flex;align-items:center;gap:10px;">  
-                    <img src="${p.userPhoto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">  
-                    <b>${p.userName}</b>  
-                </div>  
-                ${p.uid !== currentUserId ? `<button id="followBtn-${p.uid}" onclick="event.stopPropagation(); followUser('${p.uid}')" style="background:${isFollowing ? '#ccc' : '#007bff'}; color:white; border:none; padding:6px 15px; border-radius:15px; font-weight:bold;">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
-            </div>  
-            <p>${p.caption}</p>  
-            <img src="${p.imageUrl}" class="post-img" ondblclick="handleLike('${postId}', true)">  
-              
-            <div class="stats" id="stats-${postId}">  
-                <button id="likeBtn-${postId}" onclick="handleLike('${postId}')">  
-                    <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${isLiked ? 'red' : 'black'}"></i> ${likeCount}  
-                </button>  
-                <button onclick="window.location.href='comments.html?id=${postId}'">  
-                    <i class="fa-regular fa-comment"></i> ${commentCount}  
-                </button>  
-                <button>  
-                    <i class="fa-solid fa-eye"></i> ${viewCount}  
-                </button>  
-            </div>  
-        </div>`;  
+        const userData = await getUserData(p.uid);
+        const isMonetized = userData?.isMonetized || false;
 
-        if(!isViewed){ 
-            setTimeout(() => {
-                const el = document.getElementById(`post-${postId}`);
-                if(el) viewObserver.observe(el);
-            }, 100)
+        let monetizeAdHtml = '';
+        if(isMonetized && adsData.length > 0){
+            monetizeAdHtml = `<div class="creator-ad"><div class="ad-label"><i class="fa-solid fa-circle-check" style="color:green"></i> Sponsored</div><div id="creator-ad-${postId}"></div></div>`;
         }
-    });  
+
+        htmlToAdd += `
+        <div class="post-card" id="post-${postId}" data-postid="${postId}">
+            <div class="post-header" onclick="window.location.href='user-profile.html?uid=${p.uid}'" style="cursor:pointer;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <img src="${p.userPhoto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                    <b>${p.userName}</b>
+                </div>
+                ${p.uid!== currentUserId? `<button id="followBtn-${p.uid}" onclick="event.stopPropagation(); followUser('${p.uid}')" style="background:${isFollowing? '#ccc' : '#007bff'}; color:white; border:none; padding:6px 15px; border-radius:15px; font-weight:bold;">${isFollowing? 'Following' : 'Follow'}</button>` : ''}
+            </div>
+            <p>${p.caption}</p>
+
+            <div class="img-wrapper">
+                <div class="img-skeleton" id="skeleton-${postId}"></div>
+                <img src="${p.imageUrl}" class="post-img" id="img-${postId}" onload="document.getElementById('skeleton-${postId}').style.display='none'; this.style.opacity='1'" ondblclick="handleLike('${postId}', true)">
+            </div>
+
+            ${monetizeAdHtml}
+            <div class="stats-bar">
+                <span id="likeCount-${postId}"><i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${likeCount}</span>
+                <span>${commentCount} Comments • ${viewCount} Views</span>
+            </div>
+            <div class="action-bar">
+                <button id="likeBtn-${postId}" onclick="handleLike('${postId}')" class="action-btn ${isLiked? 'liked' : ''}">
+                    <i class="${isLiked? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> Like
+                </button>
+                <button onclick="window.location.href='comments.html?id=${postId}'" class="action-btn">
+                    <i class="fa-regular fa-comment"></i> Comment
+                </button>
+                <button class="action-btn"><i class="fa-solid fa-share"></i> Share</button>
+            </div>
+        </div>`;
+
+        if((globalIndex + 1) % 5 === 0 && adsData.length > 0){
+            htmlToAdd += `<div class="ad-card"><div class="ad-label">Sponsored</div><div id="global-ad-${globalIndex}"></div></div>`;
+        }
+
+        if(!isViewed){
+            setTimeout(() => { const el = document.getElementById(`post-${postId}`); if(el) viewObserver.observe(el); }, 100)
+        }
+    };
+
+    feed.insertAdjacentHTML('beforeend', htmlToAdd);
+
+    postsToShow.forEach((p, i) => {
+        const postId = p.id;
+        const globalIndex = displayedCount + i;
+        const userData = userDataCache[p.uid];
+        if(userData?.isMonetized && adsData.length > 0){ setTimeout(() => runAdScript(`creator-ad-${postId}`), 300); }
+        if((globalIndex + 1) % 5 === 0 && adsData.length > 0){ setTimeout(() => runAdScript(`global-ad-${globalIndex}`), 300); }
+    });
+
     displayedCount += POSTS_PER_LOAD;
+}
+
+function runAdScript(slotId){
+    const slot = document.getElementById(slotId);
+    if(!slot || adsData.length === 0) return;
+    const randomAd = adsData[Math.floor(Math.random() * adsData.length)];
+    slot.innerHTML = randomAd.script;
+    Array.from(slot.getElementsByTagName("script")).forEach(oldScript => {
+        const newScript = document.createElement("script");
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
 }
 
 const viewObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const postId = entry.target.dataset.postid;
+        const postId = entry.target.dataset.postid;
+        if (entry.isIntersecting &&!viewedPosts.has(postId)) {
             addView(postId);
+            viewedPosts.add(postId);
             viewObserver.unobserve(entry.target);
         }
     });
@@ -171,69 +483,75 @@ const viewObserver = new IntersectionObserver((entries) => {
 
 window.addView = async (postId) => {
     const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    const views = postSnap.data().views || [];
-    if(!views.includes(currentUserId)){
-        await updateDoc(postRef, { views: arrayUnion(currentUserId) });
-        updateStatsUI(postId);
-    }
+    await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        const views = postSnap.data().views || [];
+        if(!views.includes(currentUserId)){ transaction.update(postRef, { views: arrayUnion(currentUserId) }); }
+    });
+    updateStatsUI(postId);
 }
 
 async function updateStatsUI(postId){
     const postSnap = await getDoc(doc(db, "posts", postId));
     const p = postSnap.data();
-    const statsDiv = document.getElementById(`stats-${postId}`);
-    if(statsDiv){
-        statsDiv.innerHTML = `
-            <button id="likeBtn-${postId}" onclick="handleLike('${postId}')">  
-                <i class="${p.likes?.includes(currentUserId) ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${p.likes?.includes(currentUserId) ? 'red' : 'black'}"></i> ${p.likes?.length || 0}  
-            </button>  
-            <button onclick="window.location.href='comments.html?id=${postId}'">  
-                <i class="fa-regular fa-comment"></i> ${p.commentsCount || 0}  
-            </button>  
-            <button>  
-                <i class="fa-solid fa-eye"></i> ${p.views?.length || 0}  
-            </button>  
-        `;
-    }
+    const likeSpan = document.getElementById(`likeCount-${postId}`);
+    if(likeSpan){ likeSpan.innerHTML = `<i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${p.likes?.length || 0}`; }
 }
 
+// ✅ Transaction + Optimistic UI
 window.handleLike = async (postId, isDoubleTap = false) => {
-    const postRef = doc(db, "posts", postId);
+    const postRef = doc(db,"posts",postId);
     const btn = document.getElementById(`likeBtn-${postId}`);
-    const postSnap = await getDoc(postRef);
-    let likes = postSnap.data().likes || [];
-    let likeCount = likes.length;
-    let isLikedNow = likes.includes(currentUserId);
+    let shouldSendNoti = false;
+    let postOwner = "";
+    let isLikedNow = false;
 
-    if(!isLikedNow) {
-        await updateDoc(postRef, { likes: arrayUnion(currentUserId) });
-        likeCount++; isLikedNow = true;
-        document.getElementById("likeSound").play();
-    } else if (!isDoubleTap) {
-        await updateDoc(postRef, { likes: arrayRemove(currentUserId) });
-        likeCount--; isLikedNow = false;
-    }
-    btn.innerHTML = `<i class="${isLikedNow ? 'fa-solid' : 'fa-regular'} fa-heart" style="color:${isLikedNow ? 'red' : 'black'}"></i> ${likeCount}`;
+    await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        const postData = postSnap.data();
+        postOwner = postData.uid;
+        let likes = postData.likes || [];
+        const alreadyLiked = likes.includes(currentUserId);
+
+        if(!alreadyLiked){
+            transaction.update(postRef, { likes: arrayUnion(currentUserId) });
+            shouldSendNoti = true;
+            isLikedNow = true;
+        }
+        else if(!isDoubleTap){
+            transaction.update(postRef, { likes: arrayRemove(currentUserId) });
+            isLikedNow = false;
+        }
+    });
+
+    btn.classList.toggle('liked', isLikedNow);
+    btn.innerHTML = `<i class="${isLikedNow? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> Like`;
+    if(isLikedNow) document.getElementById("likeSound").play();
+
     updateStatsUI(postId);
-}
 
-window.followUser = async (uid) => {  
-    const btn = document.getElementById(`followBtn-${uid}`);  
-    btn.innerText = "Following";  
-    btn.style.background = "#ccc";  
-    await updateDoc(doc(db, "users", currentUserId), { following: arrayUnion(uid) });  
-    await updateDoc(doc(db, "users", uid), { followers: arrayUnion(currentUserId) });  
+    if(shouldSendNoti){
+        await sendNotification(postOwner, "like", `${(await getUserData(currentUserId)).name || "Someone"} liked your post`, postId);
+    }
+};
+
+// ✅ Transaction দিয়ে Follow
+window.followUser = async (uid)=>{
+    const btn = document.getElementById(`followBtn-${uid}`);
+    if(btn){ btn.innerText="Following"; btn.style.background="#ccc"; }
+    const userRef = doc(db,"users",currentUserId);
+    const targetRef = doc(db,"users",uid);
+    await runTransaction(db, async (transaction) => {
+        transaction.update(userRef, { following: arrayUnion(uid) });
+        transaction.update(targetRef, { followers: arrayUnion(currentUserId) });
+    });
     followingList.push(uid);
-};  
+    await sendNotification(uid, "follow", `${(await getUserData(currentUserId)).name || "Someone"} started following you`);
+};
 
 window.addEventListener('scroll', () => {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-        if(displayedCount < allPostsBuffer.length){
-            renderPosts();
-        } else {
-            loadFeed(false);
-        }
+        if(displayedCount < allPostsBuffer.length){ renderPosts(); } else { loadFeed(false); }
     }
 });
 </script>
