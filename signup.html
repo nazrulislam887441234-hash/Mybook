@@ -7,13 +7,19 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f9f9f9; padding: 20px; margin: 0; }
-        .container { width: 100%; max-width: 350px; background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .logo { width: 120px; margin-bottom: 10px; }
-        .photo-box { width: 120px; height: 120px; border-radius: 50%; background: #eee; margin: 10px auto; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; }
-        #coverPhoto { width: 100%; height: 100px; border: 2px dashed #ccc; margin: 10px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+    .container { width: 100%; max-width: 350px; background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .logo { width: 120px; margin-bottom: 10px; }
+    .photo-box { width: 120px; height: 120px; border-radius: 50%; background: #eee; margin: 10px auto; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; font-size: 12px; color: #777; }
+        #coverPhoto { width: 100%; height: 100px; border: 2px dashed #ccc; margin: 10px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; font-size: 12px; color: #777; background: #f5f5f5; }
+
+       .size-note { font-size: 12px; color: #007bff; font-weight: bold; margin-top: -5px; margin-bottom: 10px; }
+
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-top: 10px; font-size: 14px; }
         button { width: 100%; padding: 15px; background: #00ff44; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; color: white; font-size: 16px; margin-top: 15px; }
         button:disabled { background: #888; }
-        .preview { width: 100%; height: 100%; object-fit: cover; }
+    .preview { width: 100%; height: 100%; object-fit: cover; }
+
+    .loading-text { font-size: 12px; color: #28a745; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -21,15 +27,22 @@
         <img src="20260609_103856.png" class="logo">
         <input type="file" id="profileInput" hidden accept="image/*">
         <div class="photo-box" onclick="document.getElementById('profileInput').click()">Profile Photo</div>
+
         <input type="file" id="coverInput" hidden accept="image/*">
+        <div class="size-note">ব্যানার কারেক্ট সাইজ ৩২০×১০০</div>
         <div id="coverPhoto" onclick="document.getElementById('coverInput').click()">Cover Photo</div>
-        <button id="finishBtn" onclick="finishSignup()">Finish</button>
+        <div id="coverStatus" class="loading-text"></div>
+
+        <!-- বিকাশ নাম্বার ফিল্ড -->
+        <input type="tel" id="bkashNumber" placeholder="টাকা পাওয়ার জন্য বিকাশ নাম্বার দিন" required>
+
+        <button id="finishBtn" onclick="finishSignup()">Finish & Monetize On</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDgqisJ-iCXmlINKKtQv8EiKSoSp7or6vw",
@@ -45,28 +58,99 @@
         const db = getFirestore(app);
         const IMGBB_KEY = "fd8494417e28e4de2384f71202e82d27";
 
-        // ইমেজ প্রিভিউ
+        let processedCoverFile = null; // কমপ্রেস করা ফাইল এখানে থাকবে
+
+        // Profile Photo Preview
         document.getElementById('profileInput').onchange = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
             const reader = new FileReader();
             reader.onload = (ev) => { document.querySelector('.photo-box').innerHTML = `<img src="${ev.target.result}" class="preview">`; };
-            reader.readAsDataURL(e.target.files[0]);
-        };
-        document.getElementById('coverInput').onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => { document.getElementById('coverPhoto').innerHTML = `<img src="${ev.target.result}" class="preview">`; };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         };
 
-                window.finishSignup = async () => {
+        // Cover Photo Compress + Crop to 320x100 WEBP
+        document.getElementById('coverInput').onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            document.getElementById('coverStatus').innerText = "Processing...";
+
+            processedCoverFile = await processCoverImage(file);
+
+            // Preview দেখানো
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('coverPhoto').innerHTML = `<img src="${ev.target.result}" class="preview">`;
+                document.getElementById('coverStatus').innerText = "Ready - 320x100 WEBP";
+            };
+            reader.readAsDataURL(processedCoverFile);
+        };
+
+        // Image Processing Function
+        async function processCoverImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const targetW = 320;
+                    const targetH = 100;
+
+                    canvas.width = targetW;
+                    canvas.height = targetH;
+
+                    // যদি ছবি 320x100 হয় তাহলে শুধু compress করবো, crop করবো না
+                    if(img.width === targetW && img.height === targetH) {
+                        ctx.drawImage(img, 0, 0, targetW, targetH);
+                    } else {
+                        // Cover crop logic - center crop
+                        const imgRatio = img.width / img.height;
+                        const targetRatio = targetW / targetH;
+
+                        let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
+
+                        if(imgRatio > targetRatio) {
+                            // ছবি বেশি চওড়া - পাশ থেকে কাটবো
+                            sWidth = img.height * targetRatio;
+                            sx = (img.width - sWidth) / 2;
+                        } else {
+                            // ছবি বেশি লম্বা - উপর নিচ থেকে কাটবো
+                            sHeight = img.width / targetRatio;
+                            sy = (img.height - sHeight) / 2;
+                        }
+
+                        ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetW, targetH);
+                    }
+
+                    // WEBP তে convert with 80% quality
+                    canvas.toBlob((blob) => {
+                        const webpFile = new File([blob], "cover.webp", { type: "image/webp" });
+                        resolve(webpFile);
+                    }, 'image/webp', 0.8);
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.finishSignup = async () => {
             const btn = document.getElementById('finishBtn');
             const pFile = document.getElementById('profileInput').files[0];
-            const cFile = document.getElementById('coverInput').files[0];
+            const cFile = processedCoverFile; // কমপ্রেস করা ফাইল
+            const bkash = document.getElementById('bkashNumber').value.trim();
 
-            if(!pFile || !cFile) return alert("Please select both photos!");
-            
-            // LocalStorage চেক
+            if(!pFile ||!cFile) return alert("Please select both photos!");
+            if(!bkash ||!/^01[0-9]{9}$/.test(bkash)) return alert("Valid বিকাশ নাম্বার দিন 01XXXXXXXXX");
+
             const signupData = JSON.parse(localStorage.getItem('signupData'));
-            if(!signupData || !signupData.email || !signupData.password) {
+            if(!signupData ||!signupData.email ||!signupData.password) {
                 return alert("Signup data missing! Please go back to step 1.");
             }
 
@@ -74,7 +158,6 @@
             btn.disabled = true;
 
             try {
-                // ১. ইমেজ আপলোড
                 const upload = async (file) => {
                     let fd = new FormData(); fd.append("image", file);
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
@@ -84,27 +167,29 @@
                 };
 
                 const [pUrl, cUrl] = await Promise.all([upload(pFile), upload(cFile)]);
-                
-                // ২. Firebase এ ইউজার তৈরি
-                console.log("Creating user for:", signupData.email);
                 const cred = await createUserWithEmailAndPassword(auth, signupData.email, signupData.password);
-                
-                // ৩. Firestore এ ডেটা সেভ
-                await setDoc(doc(db, "users", cred.user.uid), { 
-                    name: signupData.fullName, 
-                    email: signupData.email, 
-                    profile: pUrl, 
-                    cover: cUrl,
-                    uid: cred.user.uid 
+
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    userName: signupData.fullName,
+                    email: signupData.email,
+                    userPhoto: pUrl,
+                    coverPhoto: cUrl, // ✅ এটা এখন 320x100 webp
+                    bkashNumber: bkash,
+                    uid: cred.user.uid,
+                    isMonetized: true,
+                    followers: [],
+                    following: [],
+                    createdAt: serverTimestamp()
                 });
-                
-                alert("Signup Completed login now!");
-                window.location.href = 'index.html'; 
-            } catch (err) { 
-                console.error(err); // ব্রাউজারের কনসোলে ভুলটি দেখাবে
-                alert("Error: " + err.message); 
-                btn.innerText = "Finish"; 
-                btn.disabled = false; 
+
+                localStorage.removeItem('signupData');
+                alert("Signup + Monetize Completed! Login now!");
+                window.location.href = 'index.html';
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+                btn.innerText = "Finish & Monetize On";
+                btn.disabled = false;
             }
         };
     </script>
